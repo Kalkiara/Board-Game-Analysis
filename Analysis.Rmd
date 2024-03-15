@@ -1,0 +1,337 @@
+---
+title: "Untitled"
+author: "Maria"
+date: "3/4/2024"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+pacman::p_load(tidyverse)
+```
+
+Read data
+
+```{r, warning = FALSE}
+
+# list all csv files in the directory
+pavlovia <- list.files(
+  path = "C:/Users/maria/Downloads/pls_2",
+  pattern = "*.csv",
+  full.names = TRUE
+) %>%
+  
+  map_dfr(~ read_csv(.x,
+    col_types = cols(
+
+      # set class as numeric 
+      
+        # -- reaction time columns 
+        edited_character_resp.rt = col_double(),
+        original_character_resp.rt = col_double(),
+        gaze_response.rt = col_double(),
+        landscapeA_resp.rt = col_double(),
+        landscapeB_resp.rt = col_double(),
+        seed_response.rt = col_double(),
+        token_edited_resp.rt = col_double(),
+        token_original_resp.rt = col_double(),
+        tree_response.rt = col_double(),
+      
+        # -- trial number columns
+        trials_seeds.thisN = col_double(),
+        trials_tree.thisN = col_double(),
+        trials_sight_color.thisN = col_double(),
+        trials_character_edited.thisN = col_double(),
+        trials_character_original.thisN = col_double(),
+        trials_gaze.thisN = col_double(),
+        trials_seeds.thisN = col_double(),
+        trials_sight_black.thisN = col_double(),
+        trials_sight_color.thisN = col_double(),
+        trials_tokens_edited.thisN = col_double(),
+        trials_tokens_original.thisN = col_double(),
+      
+      # set all others as factors
+      .default = col_factor()
+    )
+  ))
+
+
+
+# if you have specific levels for factors, you can specify them within the col_factor() function
+# col_factor(levels = NULL)
+
+# check to see ratio between condition A and B
+(length(unique(pavlovia$edited_character_resp.rt)) - 1) / 4
+(length(unique(pavlovia$original_character_resp.rt)) - 1) / 4
+
+class(pavlovia$token_edited_resp.corr)
+```
+
+
+
+
+```{r}
+temp_survey <- read_csv2("C:/Users/maria/Downloads/dataset_15-03.csv") %>% # read_csv2("C:/Users/maria/OneDrive/Dokumenter/Uni/Speciale/csv_temp/dataset.csv") %>%
+
+  # make labels intuitive based on translations from labels.csv
+
+  # gender
+  mutate(gender = ifelse(gender == 1, "Female",
+    ifelse(gender == 2, "Male",
+      "Other"
+    )
+  )) %>%
+  
+  # color deficiency
+  mutate(colorblind = ifelse(colorblind == 1, "Yes",
+    ifelse(colorblind == 2, "No",
+      "Unsure"
+    )
+  )) %>%
+  
+  # previous player experience
+  mutate(played_tang = ifelse(played_tang == 5, "Yes", "No")) %>%
+  mutate(played_photo = ifelse(played_photo == 5, "Yes", "No")) %>%
+  mutate(played_haven = ifelse(played_haven == 5, "Yes", "No")) %>%
+  
+  # board gaming frequency
+  mutate(freq_game = ifelse(freq_game == 1, "Weekly",
+    ifelse(freq_game == 2, "Monthly",
+      ifelse(freq_game == 3, "Every 3rd month",
+        ifelse(freq_game == 4, "Semi-annually",
+          "Rarely"
+        )
+      )
+    )
+  )) %>%
+  
+  # difficulty understanding rules
+  mutate(diff_understand = ifelse(diff_understand == 1, "Strongly agree",
+    ifelse(diff_understand == 2, "Agree",
+      ifelse(diff_understand == 3, "Neither nor",
+        ifelse(diff_understand == 4, "Disagree",
+          "Strongly disagree"
+        )
+      )
+    )
+  )) %>%
+  
+  # difficulty remembering rules
+  mutate(diff_remember = ifelse(diff_remember == 1, "Strongly agree",
+    ifelse(diff_remember == 2, "Agree",
+      ifelse(diff_remember == 3, "Neither nor",
+        ifelse(diff_remember == 4, "Disagree",
+          "Strongly disagree"
+        )
+      )
+    )
+  ))
+```
+
+Merge dataframes and fix classes
+
+```{r}
+# merge dataframes
+df <- merge(pavlovia, temp_survey) %>%
+  
+  # compute missing binary column for correct responses for original character task
+  mutate(original_character_resp.corr = ifelse(
+    as.character(original_character_resp.keys) == as.character(correct_character_options), 1,
+    ifelse(is.na(original_character_resp.keys), NA, 0)
+  )) %>%
+  
+  # make age be numeric
+  mutate(age = as.numeric(age))
+
+
+
+# evt tjek levels
+```
+
+Make dataframes for each investigation, i.e. create better overview
+
+```{r}
+# task: seed tokens on the player board
+df_seed <- df %>%
+  
+  # select relevant columns
+  select(
+    id,
+    age,
+    colorblind,
+    correctSeednumber,
+    diff_remember,
+    diff_understand,
+    freq_game,
+    gender,
+    played_photo,
+    seed_options,
+    seed_response.corr,
+    seed_response.keys,
+    seed_response.rt,
+    trials_seeds.thisN
+  ) %>% 
+  
+  # make dataframe appear compact by filtering out task-irrelevant rows
+  filter(!is.na(seed_options)) %>%
+  
+  # create columns stating the experimental manipulation and stimulus variety
+  mutate(board_color = as.factor(
+    ifelse(str_extract(seed_options, "^.{3}") == "gul", "yellow", "orange")
+  )) %>%
+  
+  mutate(manipulation = as.factor(
+    ifelse(str_extract(seed_options, ".{4}(?=.{4}$)") == "grey", "edited", "original")
+  ))
+
+# ------------------------------------
+
+# task: trees on the game board
+df_trees <- df %>%
+  
+  # select relevant columns
+  select(
+    id,
+    age,
+    colorblind,
+    correctTreenumber,
+    diff_remember,
+    diff_understand,
+    freq_game,
+    gender,
+    played_photo,
+    tree_options,
+    tree_response.corr,
+    tree_response.keys,
+    tree_response.rt,
+    trials_tree.thisN
+  ) %>% 
+  
+  # make dataframe appear compact by filtering out task-irrelevant rows
+  filter(!is.na(tree_options)) %>%
+  
+  # create columns stating the experimental manipulation and stimulus variety
+  mutate(manipulation = as.factor(
+    ifelse(str_extract(tree_options, "^.{4}") == "edit", "edited", "original")
+  )) %>%
+  
+  mutate(color_trees_to_count = as.factor(
+    ifelse(str_extract(tree_options, "(?<=_).{4}") == "gree", "green",
+      ifelse(str_extract(tree_options, "(?<=_).{4}") == "blue", "blue",
+        ifelse(str_extract(tree_options, "(?<=_).{4}") == "oran", "orange",
+          ifelse(str_extract(tree_options, "(?<=_).{4}") == "gulp", ifelse(manipulation == "edited", "pink", "yellow"),
+            NA
+          )
+        )
+      )
+    )
+  ))
+
+# ------------------------------------
+
+# task: token discernablity
+
+df_tokens <- df %>%
+  
+  # select relevant columns
+  select(
+    id,
+    age,
+    colorblind,
+    correct_token_options,
+    diff_remember,
+    diff_understand,
+    freq_game,
+    gender,
+    played_haven,
+    edited_token_options,
+    original_token_options,
+    token_original_resp.corr,
+    token_edited_resp.corr,
+    token_original_resp.keys,
+    token_edited_resp.keys,
+    token_original_resp.rt,
+    token_edited_resp.rt,
+    trials_tokens_edited.thisN,
+    trials_tokens_original.thisN
+  ) %>% 
+  
+  # make collective columns for stimuli, RT, etc. across condition
+  mutate(token_options = as.factor(
+    ifelse(is.na(original_token_options), as.character(edited_token_options), as.character(original_token_options))
+    )) %>%
+  
+  mutate(RT = ifelse(is.na(token_edited_resp.rt), token_original_resp.rt, token_edited_resp.rt)) %>% 
+  
+  mutate(trials_tokens.thisN = as.numeric(
+    ifelse(is.na(trials_tokens_edited.thisN), as.character(trials_tokens_original.thisN), as.character(trials_tokens_edited.thisN)
+    ))) %>% 
+  
+  mutate(token_resp.corr = as.numeric(
+    ifelse(is.na(token_edited_resp.corr), as.character(token_original_resp.corr), as.character(token_edited_resp.corr)
+    ))) %>%  
+
+  # remove old columns
+  select(-original_token_options, 
+         -edited_token_options, 
+         -token_original_resp.rt, 
+         -token_edited_resp.rt, 
+         -token_edited_resp.corr, 
+         -token_original_resp.corr, 
+         -trials_tokens_edited.thisN, 
+         -trials_tokens_original.thisN) %>% 
+  
+  # make dataframe appear compact by filtering out task and condition-irrelevant rows 
+  filter(!is.na(RT)) %>%
+  
+    # create columns stating the experimental manipulation and stimulus variety
+  mutate(manipulation = as.factor(
+    ifelse(str_extract(token_options, "^.{4}") == "edit", "edited", "original")
+    )) %>%
+  
+  mutate(token_color = as.factor(
+    ifelse(str_extract(token_options, "(?<=tokens_).{4}") == "blue", "blue", "green")
+    )) 
+
+# ------------------------------------
+
+# task: gaze direction
+df_gaze <- df %>%
+  
+  # select relevant columns
+  select(
+    id,
+    age,
+    colorblind,
+    correctGazeanswer,
+    diff_remember,
+    diff_understand,
+    freq_game,
+    gender,
+    played_tang,
+    options,
+    gaze_response.corr,
+    gaze_response.keys,
+    gaze_response.rt,
+    trials_gaze.thisN,
+  ) %>% 
+  
+  # make dataframe appear compact by filtering out task-irrelevant rows
+  filter(!is.na(options)) %>%
+  
+  # create columns stating the experimental manipulation and stimulus variety
+  mutate(manipulation = as.factor(
+    ifelse(str_extract(options, "(?<=_).{3}") == "cue", "edited", "original")
+  )) %>%
+  
+  mutate(stimulus_type = as.factor(str_extract(options, ".{5}")))
+
+# ------------------------------------
+
+class(df_tokens$trials_tokens.thisN)
+str_extract(df_gaze$options, ".{5}")
+```
