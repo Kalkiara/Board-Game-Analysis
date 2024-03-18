@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 pacman::p_load(tidyverse)
 ```
 
-Read data
+Read experimental data
 
 ```{r, warning = FALSE}
 
@@ -71,8 +71,7 @@ pavlovia <- list.files(
 class(pavlovia$token_edited_resp.corr)
 ```
 
-
-
+Read survey data
 
 ```{r}
 temp_survey <- read_csv2("C:/Users/maria/Downloads/dataset_15-03.csv") %>% # read_csv2("C:/Users/maria/OneDrive/Dokumenter/Uni/Speciale/csv_temp/dataset.csv") %>%
@@ -80,56 +79,94 @@ temp_survey <- read_csv2("C:/Users/maria/Downloads/dataset_15-03.csv") %>% # rea
   # make labels intuitive based on translations from labels.csv
 
   # gender
-  mutate(gender = ifelse(gender == 1, "Female",
+  mutate(gender = as.factor(
+    ifelse(gender == 1, "Female",
     ifelse(gender == 2, "Male",
       "Other"
+      )
     )
   )) %>%
   
   # color deficiency
-  mutate(colorblind = ifelse(colorblind == 1, "Yes",
+  mutate(colorblind = factor(
+    ifelse(colorblind == 1, "Yes",
     ifelse(colorblind == 2, "No",
       "Unsure"
-    )
+      )
+    ), 
+    levels = c("No",
+               "Yes",
+               "Unsure")
   )) %>%
   
   # previous player experience
-  mutate(played_tang = ifelse(played_tang == 5, "Yes", "No")) %>%
-  mutate(played_photo = ifelse(played_photo == 5, "Yes", "No")) %>%
-  mutate(played_haven = ifelse(played_haven == 5, "Yes", "No")) %>%
+  mutate(played_tang = as.factor(
+    ifelse(played_tang == 5, "Yes", "No")
+    )) %>%
+  
+  mutate(played_photo = as.factor(
+    ifelse(played_photo == 5, "Yes", "No")
+    )) %>%
+  
+  mutate(played_haven = as.factor(
+    ifelse(played_haven == 5, "Yes", "No")
+    )) %>%
   
   # board gaming frequency
-  mutate(freq_game = ifelse(freq_game == 1, "Weekly",
-    ifelse(freq_game == 2, "Monthly",
-      ifelse(freq_game == 3, "Every 3rd month",
-        ifelse(freq_game == 4, "Semi-annually",
+  mutate(freq_game = factor(
+    ifelse(freq_game == 1, "Weekly",
+      ifelse(freq_game == 2, "Monthly",
+        ifelse(freq_game == 3, "Every 3rd month",
+         ifelse(freq_game == 4, "Semi-annually",
           "Rarely"
+          )
         )
       )
-    )
+    ), 
+    levels = c("Strongly disagree",
+                  "Disagree", 
+                  "Neither nor", 
+                  "Agree", 
+                  "Strongly agree")
   )) %>%
   
   # difficulty understanding rules
-  mutate(diff_understand = ifelse(diff_understand == 1, "Strongly agree",
-    ifelse(diff_understand == 2, "Agree",
-      ifelse(diff_understand == 3, "Neither nor",
-        ifelse(diff_understand == 4, "Disagree",
+  mutate(diff_understand = factor(
+    ifelse(diff_understand == 1, "Strongly agree",
+      ifelse(diff_understand == 2, "Agree",
+        ifelse(diff_understand == 3, "Neither nor",
+          ifelse(diff_understand == 4, "Disagree",
           "Strongly disagree"
+          )
         )
       )
-    )
+    ), 
+    levels = c("Strongly disagree",
+                  "Disagree", 
+                  "Neither nor", 
+                  "Agree", 
+                  "Strongly agree")
   )) %>%
   
   # difficulty remembering rules
-  mutate(diff_remember = ifelse(diff_remember == 1, "Strongly agree",
-    ifelse(diff_remember == 2, "Agree",
-      ifelse(diff_remember == 3, "Neither nor",
-        ifelse(diff_remember == 4, "Disagree",
+  mutate(diff_remember = factor(
+    ifelse(diff_remember == 1, "Strongly agree",
+      ifelse(diff_remember == 2, "Agree",
+        ifelse(diff_remember == 3, "Neither nor",
+          ifelse(diff_remember == 4, "Disagree",
           "Strongly disagree"
+          )
         )
       )
-    )
-  ))
+    ), 
+    levels = c("Strongly disagree",
+                  "Disagree", 
+                  "Neither nor", 
+                  "Agree", 
+                  "Strongly agree")
+  )) 
+
+
 ```
 
 Merge dataframes and fix classes
@@ -147,9 +184,6 @@ df <- merge(pavlovia, temp_survey) %>%
   # make age be numeric
   mutate(age = as.numeric(age))
 
-
-
-# evt tjek levels
 ```
 
 Make dataframes for each investigation, i.e. create better overview
@@ -184,8 +218,10 @@ df_seed <- df %>%
     ifelse(str_extract(seed_options, "^.{3}") == "gul", "yellow", "orange")
   )) %>%
   
-  mutate(manipulation = as.factor(
-    ifelse(str_extract(seed_options, ".{4}(?=.{4}$)") == "grey", "edited", "original")
+  mutate(manipulation = factor(
+    ifelse(str_extract(seed_options, ".{4}(?=.{4}$)") == "grey", "edited", "original"), 
+    levels = c("original",
+               "edited")
   ))
 
 # ------------------------------------
@@ -215,8 +251,10 @@ df_trees <- df %>%
   filter(!is.na(tree_options)) %>%
   
   # create columns stating the experimental manipulation and stimulus variety
-  mutate(manipulation = as.factor(
-    ifelse(str_extract(tree_options, "^.{4}") == "edit", "edited", "original")
+  mutate(manipulation = factor(
+    ifelse(str_extract(tree_options, "^.{4}") == "edit", "edited", "original"), 
+    levels = c("original",
+               "edited")
   )) %>%
   
   mutate(color_trees_to_count = as.factor(
@@ -289,8 +327,10 @@ df_tokens <- df %>%
   filter(!is.na(RT)) %>%
   
     # create columns stating the experimental manipulation and stimulus variety
-  mutate(manipulation = as.factor(
-    ifelse(str_extract(token_options, "^.{4}") == "edit", "edited", "original")
+  mutate(manipulation = factor(
+    ifelse(str_extract(token_options, "^.{4}") == "edit", "edited", "original"), 
+    levels = c("original",
+               "edited")
     )) %>%
   
   mutate(token_color = as.factor(
@@ -324,8 +364,10 @@ df_gaze <- df %>%
   filter(!is.na(options)) %>%
   
   # create columns stating the experimental manipulation and stimulus variety
-  mutate(manipulation = as.factor(
-    ifelse(str_extract(options, "(?<=_).{3}") == "cue", "edited", "original")
+  mutate(manipulation = factor(
+    ifelse(str_extract(options, "(?<=_).{3}") == "cue", "edited", "original"), 
+    levels = c("original",
+               "edited")
   )) %>%
   
   mutate(stimulus_type = as.factor(str_extract(options, ".{5}")))
@@ -388,8 +430,10 @@ df_character <- df %>%
   filter(!is.na(RT)) %>%
   
     # create columns stating the experimental manipulation and stimulus variety
-  mutate(manipulation = as.factor(
-    ifelse(str_extract(character_options, "^.{4}") == "edit", "edited", "original")
+  mutate(manipulation = factor(
+    ifelse(str_extract(character_options, "^.{4}") == "edit", "edited", "original"), 
+    levels = c("original",
+               "edited")
     )) %>%
   
   mutate(character_type = as.factor(
@@ -450,10 +494,26 @@ df_icon <- df %>%
   filter(!is.na(RT)) %>%
   
     # create columns stating the experimental manipulation and stimulus variety
-  mutate(manipulation = as.factor(
-    ifelse(str_extract(landscape_options, "(?<=_).{5}") == "color", "color", "black")
+  mutate(manipulation = factor(
+    ifelse(str_extract(landscape_options, "(?<=_).{5}") == "color", "edited", "original"), 
+    levels = c("original",
+               "edited")
     )) 
+
+```
+
 
 
 
 ```
+
+```{r}
+
+
+
+
+
+
+
+```
+
