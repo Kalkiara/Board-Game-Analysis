@@ -332,6 +332,128 @@ df_gaze <- df %>%
 
 # ------------------------------------
 
-class(df_tokens$trials_tokens.thisN)
-str_extract(df_gaze$options, ".{5}")
+# task: character color match
+
+df_character <- df %>%
+  
+  # select relevant columns
+  select(
+    id,
+    age,
+    colorblind,
+    correct_character_options,
+    diff_remember,
+    diff_understand,
+    freq_game,
+    gender,
+    played_tang,
+    edited_character_options,
+    original_character_options,
+    edited_character_resp.corr,
+    original_character_resp.corr,
+    edited_character_resp.keys,
+    original_character_resp.keys,
+    edited_character_resp.rt,
+    original_character_resp.rt,
+    trials_character_edited.thisN,
+    trials_character_original.thisN
+  ) %>% 
+  
+  # make collective columns for stimuli, RT, etc. across condition
+  mutate(character_options = as.factor(
+    ifelse(is.na(original_character_options), as.character(edited_character_options), as.character(original_character_options))
+    )) %>%
+  
+  mutate(RT = ifelse(is.na(edited_character_resp.rt), original_character_resp.rt, edited_character_resp.rt)) %>% 
+  
+  mutate(trials_character.thisN = as.numeric(
+    ifelse(is.na(trials_character_edited.thisN), as.character(trials_character_original.thisN), as.character(trials_character_edited.thisN)
+    ))) %>% 
+  
+  mutate(character_resp.corr = as.numeric(
+    ifelse(is.na(edited_character_resp.corr), as.character(original_character_resp.corr), as.character(edited_character_resp.corr)
+    ))) %>%  
+
+  # remove old columns
+  select(-original_character_options, 
+         -edited_character_options, 
+         -original_character_resp.rt, 
+         -edited_character_resp.rt, 
+         -original_character_resp.corr, 
+         -edited_character_resp.corr, 
+         -trials_character_original.thisN, 
+         -trials_character_edited.thisN) %>% 
+  
+  # make dataframe appear compact by filtering out task and condition-irrelevant rows 
+  filter(!is.na(RT)) %>%
+  
+    # create columns stating the experimental manipulation and stimulus variety
+  mutate(manipulation = as.factor(
+    ifelse(str_extract(character_options, "^.{4}") == "edit", "edited", "original")
+    )) %>%
+  
+  mutate(character_type = as.factor(
+    ifelse(str_extract(character_options, "(?<=_).{4}") == "poet", "poet", 
+      ifelse(str_extract(character_options, "(?<=_).{4}") == "herm", "hermit", 
+        ifelse(str_extract(character_options, "(?<=_).{4}") == "monk", "monk", "architect")))
+    ))
+
+# ------------------------------------
+
+# task: icon matching for sight symbols/landscapes
+
+df_icon <- df %>%
+  
+  # select relevant columns
+  select(
+    id,
+    age,
+    colorblind,
+    correct_landscape_options,
+    diff_remember,
+    diff_understand,
+    freq_game,
+    gender,
+    played_tang,
+    landscape_options,
+    landscapeA_resp.corr,
+    landscapeB_resp.corr,
+    landscapeA_resp.keys,
+    landscapeB_resp.keys,
+    landscapeA_resp.rt,
+    landscapeB_resp.rt,
+    trials_sight_black.thisN,
+    trials_sight_color.thisN
+  ) %>% 
+  
+  # make collective columns for stimuli, RT, etc. across condition
+  mutate(RT = ifelse(is.na(landscapeA_resp.rt), landscapeB_resp.rt, landscapeA_resp.rt)) %>% 
+  
+  mutate(trials.thisN = as.numeric(
+    ifelse(is.na(trials_sight_black.thisN), as.character(trials_sight_color.thisN), as.character(trials_sight_black.thisN)
+    ))) %>% 
+  
+  mutate(icon_resp.corr = as.numeric(
+    ifelse(is.na(landscapeA_resp.corr), as.character(landscapeB_resp.corr), as.character(landscapeA_resp.corr)
+    ))) %>%  
+
+  # remove old columns
+  select(
+         -landscapeA_resp.rt, 
+         -landscapeB_resp.rt, 
+         -landscapeA_resp.corr, 
+         -landscapeB_resp.corr, 
+         -trials_sight_black.thisN, 
+         -trials_sight_color.thisN) %>% 
+  
+  # make dataframe appear compact by filtering out task and condition-irrelevant rows 
+  filter(!is.na(RT)) %>%
+  
+    # create columns stating the experimental manipulation and stimulus variety
+  mutate(manipulation = as.factor(
+    ifelse(str_extract(landscape_options, "(?<=_).{5}") == "color", "color", "black")
+    )) 
+
+
+
 ```
