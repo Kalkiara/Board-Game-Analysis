@@ -1,0 +1,98 @@
+---
+title: "Untitled"
+author: "Maria"
+date: "3/19/2024"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+pacman::p_load(tidyverse, lmerTest)
+```
+
+Run the data cleaning .Rmd script
+
+```{r, warning = FALSE}
+
+file_name <- "Data cleaning.Rmd"
+rmarkdown::render(file_name, quiet = TRUE)
+
+```
+
+Handle outliers before modelling
+
+```{r}
+# outlier cutoff 
+upper_bound <- mean(df_seed$seed_response.rt) + 3 * sd(df_seed$seed_response.rt) # upper boundary
+
+df_seed <- df_seed %>%
+  filter(seed_response.corr == 1) %>% # keep only correct answers
+  mutate(RT = ifelse(
+    seed_response.rt >= upper_bound, upper_bound, seed_response.rt)) # replace values exceeding the upper boundary 
+
+```
+
+
+Modelling
+
+```{r}
+# basic
+seed_m1 <- lmer(RT ~ 1 + manipulation + (1 |id), data = df_seed)
+seed_m2 <- lmer(RT ~ 1 + manipulation + (1 |freq_game:id) + (1|id), data = df_seed)
+
+seed_m2 <- lmer(RT ~ 1 + manipulation + age + (1 |id), data = df_seed)
+seed_m2 <- lmer(RT ~ 1 + manipulation + gender + (1 |id), data = df_seed)
+seed_m3 <- lmer(RT ~ 1 + manipulation + age + gender + (1 |id), data = df_seed)
+seed_m3 <- lmer(RT ~ 1 + manipulation + age + gender + board_color + (1 |id), data = df_seed)
+seed_m1 <- lmer(RT ~ 1 + manipulation + board_color + (1 |id), data = df_seed)
+
+# controlling for stimulus order
+seed_m1 <- lmer(RT ~ 1 + manipulation + trials_seeds.thisN + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + age + trials_seeds.thisN + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + gender + trials_seeds.thisN + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + (1 |id), data = df_seed)
+seed_m1 <- lmer(RT ~ 1 + manipulation + board_color + trials_seeds.thisN + (1 |id), data = df_seed)
+
+# controlling for response key
+seed_m1 <- lmer(RT ~ 1 + manipulation + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + age + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + gender + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed)
+seed_m1 <- lmer(RT ~ 1 + manipulation + board_color + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed)
+
+# controlling for having played the game
+seed_m1 <- lmer(RT ~ 1 + manipulation + trials_seeds.thisN + played_photo + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + age + trials_seeds.thisN + played_photo + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + gender + trials_seeds.thisN + played_photo + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + played_photo + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + played_photo + (1 |id), data = df_seed)
+seed_m1 <- lmer(RT ~ 1 + manipulation + board_color + trials_seeds.thisN + played_photo + (1 |id), data = df_seed)
+
+# controlling for frequency of gaming
+seed_m1 <- lmer(RT ~ 1 + manipulation + trials_seeds.thisN + freq_game + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + age + trials_seeds.thisN + freq_game + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + gender + trials_seeds.thisN + freq_game + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + freq_game + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + freq_game + (1 |id), data = df_seed)
+seed_m1 <- lmer(RT ~ 1 + manipulation + board_color + trials_seeds.thisN + freq_game + (1 |id), data = df_seed)
+
+# consider controlling for colorblindness
+
+```
+
+
+Checking assumptions
+
+```{r}
+
+
+
+
+```
+
