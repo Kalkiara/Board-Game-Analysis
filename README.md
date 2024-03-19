@@ -12,7 +12,7 @@ The organization of the project is as follows:
 |   ├── xx                   <- xx
 |   └── xx                   <- xx
 ├── src                      <- The main folder for scripts
-|   ├── xx                   <- xx
+|   ├── xx                   <- For cleaning and restructuring the raw data in preparation for modelling
 |   └── xx                   <- xx
 ├── .gitignore               <- A list of files not uploaded to git
 └── xx                       <- xx
