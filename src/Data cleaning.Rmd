@@ -173,7 +173,8 @@ Merge dataframes and fix classes
 
 ```{r}
 # merge dataframes
-df <- merge(pavlovia, temp_survey) %>%
+df <- merge(pavlovia, 
+            temp_survey) %>%
   
   # compute missing binary column for correct responses for original character task
   mutate(original_character_resp.corr = ifelse(
@@ -221,8 +222,12 @@ df_seed <- df %>%
   mutate(manipulation = factor(
     ifelse(str_extract(seed_options, ".{4}(?=.{4}$)") == "grey", "edited", "original"), 
     levels = c("original",
-               "edited")
-  ))
+               "edited") 
+  )) %>% 
+  
+  # rename response time column
+  rename(
+    RT = seed_response.rt)
 
 # ------------------------------------
 
@@ -267,7 +272,11 @@ df_trees <- df %>%
         )
       )
     )
-  ))
+  )) %>% 
+  
+  # rename response time column
+  rename(
+    RT = tree_response.rt)
 
 # ------------------------------------
 
@@ -370,7 +379,11 @@ df_gaze <- df %>%
                "edited")
   )) %>%
   
-  mutate(stimulus_type = as.factor(str_extract(options, ".{5}")))
+  mutate(stimulus_type = as.factor(str_extract(options, ".{5}"))) %>% 
+  
+  # rename response time column
+  rename(
+    RT = gaze_response.rt)
 
 # ------------------------------------
 
