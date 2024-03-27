@@ -25,77 +25,6 @@ rm(file_name)
 ```
 
 Handle outliers before modelling
-possibly redundant
-
-```{r}
-# # outlier cutoffs
-# # upper_bound_seed <- mean(df_seed$seed_response.rt) + 3 * sd(df_seed$seed_response.rt) # upper boundary
-# 
-# upper_bound <- function(df, rt_term) {
-#   cutoff <- mean(df[[rt_term]]) + 3 * sd(df[[rt_term]])
-#   return(cutoff)
-# }
-# 
-# 
-# upper_bound_seed <- upper_bound(
-#   df_seed, 
-#   "RT")
-# 
-# upper_bound_trees <- upper_bound(
-#   df_trees, 
-#   "RT")
-# 
-# upper_bound_tokens <- upper_bound(
-#   df_tokens, 
-#   "RT")
-# 
-# upper_bound_gaze <- upper_bound(
-#   df_gaze, 
-#   "RT")
-# 
-# upper_bound_character <- upper_bound(
-#   df_character, 
-#   "RT")
-# 
-# upper_bound_icons <- upper_bound(
-#   df_icon, 
-#   "RT")
-
-# _____
-
-# df_seed <- df_seed %>%
-#   filter(seed_response.corr == 1) %>% # keep only correct answers
-#   mutate(RT = ifelse(
-#     seed_response.rt >= upper_bound_seed, upper_bound_seed, seed_response.rt)) # replace values exceeding the upper boundary
-# 
-# df_trees <- df_trees %>%
-#   filter(tree_response.corr == 1) %>% # keep only correct answers
-#   mutate(RT = ifelse(
-#     tree_response.rt >= upper_bound_trees, upper_bound_trees, tree_response.rt)) # replace values exceeding the upper boundary
-# 
-# df_tokens <- df_tokens %>%
-#   filter(token_resp.corr == 1) %>% # keep only correct answers
-#   mutate(RT = ifelse(
-#     RT >= upper_bound_tokens, upper_bound_tokens, RT)) # replace values exceeding the upper boundary
-# 
-# df_gaze <- df_gaze %>%
-#   filter(gaze_response.corr == 1) %>% # keep only correct answers
-#   mutate(RT = ifelse(
-#     gaze_response.rt >= upper_bound_gaze, upper_bound_gaze, gaze_response.rt)) # replace values exceeding the upper boundary
-# 
-# df_character <- df_character %>%
-#   # filter(character_resp.corr == 1) %>% # keep only correct answers
-#   mutate(RT = ifelse(
-#     RT >= upper_bound_character, upper_bound_character, RT)) # replace values exceeding the upper boundary
-# 
-# df_icon <- df_icon %>%
-#   filter(icon_resp.corr == 1) %>% # keep only correct answers
-#   mutate(RT = ifelse(
-#     RT >= upper_bound_icons, upper_bound_icons, RT)) # replace values exceeding the upper boundary
-
-```
-
-Handle outliers before modelling
 
 ```{r}
 # function for finding cutoff for outliers
@@ -108,13 +37,17 @@ upper_bound <- function(df, rt_term) {
 df_list <- list(df_seed, 
                 df_trees, 
                 df_tokens, 
-                df_gaze)
+                df_gaze,
+                df_character,
+                df_icon)
 
 # corresponding vector of dataframe names
 df_names <- c("df_seed",
               "df_trees", 
               "df_tokens", 
-              "df_gaze")
+              "df_gaze",
+              "df_character",
+              "df_icon")
 
 # calculate and store upper bound for each dataframe
 upper_bounds <- lapply(df_list, function(df) {
@@ -144,6 +77,11 @@ modified_dfs_list <- replace_outliers(df_list, upper_bounds)
 for (i in seq_along(modified_dfs_list)) {
   assign(df_names[i], modified_dfs_list[[i]], envir = .GlobalEnv)
 }
+
+rm(modified_dfs_list,
+   upper_bounds,
+   df_names,
+   i)
 
 ```
 
@@ -182,53 +120,64 @@ icon_density <- ggplot(df_icon, aes(x = RT)) +
   theme_minimal()
 
 # plot using patchwork
-(seed_density+tree_density)/(token_density+gaze_density)/(character_density+icon_density)
-```
+denity_response_times <- 
+  (seed_density+tree_density)/
+  (token_density+gaze_density)/
+  (character_density+icon_density)
 
+denity_response_times
+
+rm(seed_density,
+   tree_density,
+   token_density,
+   gaze_density,
+   character_density,
+   icon_density)
+```
 
 Modelling: Task with seed tokens
 
 ```{r}
 # basic
-seed_m1 <- lmer(RT ~ 1 + manipulation + (1 |id), data = df_seed)
-seed_m2 <- lmer(RT ~ 1 + manipulation + (1 |freq_game:id) + (1|id), data = df_seed)
-seed_m3 <- lmer(RT ~ 1 + manipulation + age + (1 |id), data = df_seed)
-seed_m4 <- lmer(RT ~ 1 + manipulation + gender + (1 |id), data = df_seed)
-seed_m5 <- lmer(RT ~ 1 + manipulation + age + gender + (1 |id), data = df_seed)
-seed_m6 <- lmer(RT ~ 1 + manipulation + age + gender + board_color + (1 |id), data = df_seed)
-seed_m7 <- lmer(RT ~ 1 + manipulation + board_color + (1 |id), data = df_seed)
+seed_m1 <- lmer(RT ~ 1 + manipulation + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m2 <- lmer(RT ~ 1 + manipulation + (1 |freq_game:id) + (1|id), data = df_seed, subset = seed_response.corr == "1")
+seed_m3 <- lmer(RT ~ 1 + manipulation + age + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m4 <- lmer(RT ~ 1 + manipulation + gender + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m5 <- lmer(RT ~ 1 + manipulation + age + gender + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m6 <- lmer(RT ~ 1 + manipulation + age + gender + board_color + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m7 <- lmer(RT ~ 1 + manipulation + board_color + (1 |id), data = df_seed, subset = seed_response.corr == "1")
 
 # controlling for stimulus order
-seed_m8 <- lmer(RT ~ 1 + manipulation + trials_seeds.thisN + (1 |id), data = df_seed)
-seed_m9 <- lmer(RT ~ 1 + manipulation + age + trials_seeds.thisN + (1 |id), data = df_seed)
-seed_m10 <- lmer(RT ~ 1 + manipulation + gender + trials_seeds.thisN + (1 |id), data = df_seed)
-seed_m11 <- lmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + (1 |id), data = df_seed)
-seed_m12 <- lmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + (1 |id), data = df_seed)
-seed_m13 <- lmer(RT ~ 1 + manipulation + board_color + trials_seeds.thisN + (1 |id), data = df_seed)
+seed_m8 <- lmer(RT ~ 1 + manipulation + trials_seeds.thisN + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m9 <- lmer(RT ~ 1 + manipulation + age + trials_seeds.thisN + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m10 <- lmer(RT ~ 1 + manipulation + gender + trials_seeds.thisN + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m11 <- lmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m12 <- lmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m13 <- lmer(RT ~ 1 + manipulation + board_color + trials_seeds.thisN + (1 |id), data = df_seed, subset = seed_response.corr == "1")
 
 # controlling for response key
-seed_m14 <- lmer(RT ~ 1 + manipulation + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed)
-seed_m15 <- lmer(RT ~ 1 + manipulation + age + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed)
-seed_m16 <- lmer(RT ~ 1 + manipulation + gender + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed)
-seed_m17 <- lmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed)
-seed_m18 <- lmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed)
-seed_m19 <- lmer(RT ~ 1 + manipulation + board_color + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed)
+seed_m14 <- lmer(RT ~ 1 + manipulation + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m15 <- lmer(RT ~ 1 + manipulation + age + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m16 <- lmer(RT ~ 1 + manipulation + gender + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m17 <- lmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m18 <- lmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m19 <- lmer(RT ~ 1 + manipulation + board_color + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed, subset = seed_response.corr == "1")
 
 # controlling for having played the game
-seed_m20 <- lmer(RT ~ 1 + manipulation + trials_seeds.thisN + played_photo + (1 |id), data = df_seed)
-seed_m21 <- lmer(RT ~ 1 + manipulation + age + trials_seeds.thisN + played_photo + (1 |id), data = df_seed)
-seed_m22 <- lmer(RT ~ 1 + manipulation + gender + trials_seeds.thisN + played_photo + (1 |id), data = df_seed)
-seed_m23 <- lmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + played_photo + (1 |id), data = df_seed)
-seed_m24 <- lmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + played_photo + (1 |id), data = df_seed)
-seed_m25 <- lmer(RT ~ 1 + manipulation + board_color + trials_seeds.thisN + played_photo + (1 |id), data = df_seed)
+seed_m20 <- lmer(RT ~ 1 + manipulation + trials_seeds.thisN + played_photo + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m21 <- lmer(RT ~ 1 + manipulation + age + trials_seeds.thisN + played_photo + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m22 <- lmer(RT ~ 1 + manipulation + gender + trials_seeds.thisN + played_photo + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m23 <- lmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + played_photo + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m24 <- lmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + played_photo + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m25 <- lmer(RT ~ 1 + manipulation + board_color + trials_seeds.thisN + played_photo + (1 |id), data = df_seed, subset = seed_response.corr == "1")
 
 # controlling for frequency of gaming
-seed_m26 <- lmer(RT ~ 1 + manipulation + trials_seeds.thisN + freq_game + (1 |id), data = df_seed)
-seed_m27 <- lmer(RT ~ 1 + manipulation + age + trials_seeds.thisN + freq_game + (1 |id), data = df_seed)
-seed_m28 <- lmer(RT ~ 1 + manipulation + gender + trials_seeds.thisN + freq_game + (1 |id), data = df_seed)
-seed_m29 <- lmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + freq_game + (1 |id), data = df_seed)
-seed_m30 <- lmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + freq_game + (1 |id), data = df_seed)
-seed_m31 <- lmer(RT ~ 1 + manipulation + board_color + trials_seeds.thisN + freq_game + (1 |id), data = df_seed)
+seed_m26 <- lmer(RT ~ 1 + manipulation + trials_seeds.thisN + freq_game + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m27 <- lmer(RT ~ 1 + manipulation + age + trials_seeds.thisN + freq_game + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m28 <- lmer(RT ~ 1 + manipulation + gender + trials_seeds.thisN + freq_game + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m29 <- lmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + freq_game + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m30 <- lmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + freq_game + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m31 <- lmer(RT ~ 1 + manipulation + board_color + trials_seeds.thisN + freq_game + (1 |id), data = df_seed, subset = seed_response.corr == "1")
 
 # consider controlling for colorblindness
 
@@ -281,50 +230,65 @@ return(table)
 }
 
 # apply the function to each of the tasks/investigations
-seed_model_selection <- model_selection("seed_m", 31)
+seed_model_selection <- model_selection("seed_m", 31) 
 
 ```
 
 
-
-
-
-
-Checking assumptions
+Checking assumptions - residual plotting
 
 ```{r}
-df_seed <- df_seed %>% 
-  mutate(logRT = log(RT))
+# list of selected models
+models <- list(
+  seed_m1_trans = lmer(logRT ~ 1 + manipulation + age + trials_seeds.thisN + played_photo + (1 | id), data = df_seed, subset = seed_response.corr == "1"),
+  seed_m1_trans2 = lmer(logRT ~ 1 + manipulation + age + (1 | id), data = df_seed, subset = seed_response.corr == "1") 
+)
 
-seed_m1_trans <- lmer(logRT ~ 1 + manipulation + (1 |id), data = df_seed)
+# function to create residual plots 
+create_residual_plot <- function(model, 
+                                 model_name) {
+  
+  # extract residuals and fitted values
+  residuals <- resid(model)
+  fitted_values <- fitted(model)
+  residual_data <- data.frame(Residuals = residuals, 
+                              Fitted_Values = fitted_values)
+  
+  # plot 
+  ggplot(residual_data, aes(x = Fitted_Values, y = Residuals)) +
+    geom_point(color = "blue", 
+               alpha = 0.7) +
+    geom_hline(yintercept = 0, 
+               linetype = "dashed", 
+               color = "red") +
+    labs(title = "Residuals vs Fitted Values", 
+         subtitle = paste("Model:", model_name), 
+         x = "Fitted Values", 
+         y = "Residuals") +
+    theme_minimal()
+}
 
-seed_m1_g <- glmer(RT ~ 1 + manipulation + (1 |id), family = Gamma(link = "log"), data = df_seed)
+# make plots for each model
+plots <- lapply(names(models), function(model_name) {
+  create_residual_plot(models[[model_name]], model_name)
+})
 
-# Q-Q plot of residuals
-qqnorm(residuals(seed_m1_g))
-qqline(residuals(seed_m1_g))
+custom_palette <- c("red", "green")
+# Loop through each plot and modify the color properties
+for (i in seq_along(plots)) {
+  plots[[i]] <- plots[[i]] + scale_color_manual(values = custom_palette[i])
+}
 
+# arrange plots in grid
+wrap_plots(plots)
 
+```
+
+QQ-plot
+
+```{r}
 # Q-Q plot of residuals
 qqnorm(residuals(seed_m1_trans))
 qqline(residuals(seed_m1_trans))
-
-hist(residuals(seed_m1_trans), main = "Histogram of Residuals")
-```
-
-
-```{r}
-
-plot(seed_m15_trans)
-plot(seed_m1_g)
-
-# Histogram of residuals
-hist(residuals(seed_m1), main = "Histogram of Residuals")
-
-# Q-Q plot of residuals
-qqnorm(residuals(seed_m1))
-qqline(residuals(seed_m1))
-
-
 ```
 
