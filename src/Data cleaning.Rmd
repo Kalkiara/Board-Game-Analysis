@@ -19,7 +19,6 @@ Read experimental data
 
 ```{r, warning = FALSE}
 
-getwd()
 # list all csv files in the directory
 pavlovia <- list.files(
   path = "../data/raw data/experimental data",
@@ -165,6 +164,26 @@ survey <- read_csv2("../data/raw data/survey data/dataset.csv") %>%
 
 
 ```
+
+```{r}
+# fix id typos and handle æøå in preparation for merging
+
+survey <- survey %>% 
+  
+  # use case_when instead of ifelse to handle str_extract for shorter strings
+  mutate(id = case_when(
+    str_extract(id, ".{10}$") == "tspil33445" ~ "brætspil33445",
+    str_extract(id, ".{5}$") == "NS112" ~ "HØNS112",
+    id == "111223" ~ "11123",
+    
+    TRUE ~ id # else retain the original id value
+  ))
+
+# HØNS112 | H\xd8NS112
+# brætspil33445 | br\xe6tspil33445
+# 11123 | 111223
+```
+
 
 Merge dataframes and fix classes
 
