@@ -1,0 +1,18 @@
+questionName;variableName;questionType;subType;questionText;choiceValue;choiceText
+consent;consent;Closed;Single;"Jeg har læst og er indforstået med ovenstående ";;
+age;age;Open;Double;"Generel information - Hvor gammel er du?";;
+gender;gender;Closed;Single;"Generel information - Hvad er dit køn?";;
+colorblind;colorblind;Closed;Single;"Generel information - Er du farveblind?";;
+played_tang;played_tang;Closed;Single;"Brætspilshistorik   - Jeg har før spillet brætspillet ""Tang Garden""";;
+played_photo;played_photo;Closed;Single;"Brætspilshistorik   - Jeg har før spillet brætspillet ""Photosynthesis""";;
+played_haven;played_haven;Closed;Single;"Brætspilshistorik   - Jeg har før spillet brætspillet ""Haven""";;
+freq_game;freq_game;Closed;Single;"Brætspilshistorik fortsat - I gennemsnit spiller jeg brætspil ...";;
+diff_understand;diff_understand;Closed;Single;"Brætspilshistorik fortsat - Jeg oplever ofte at have svært ved at forstå regler til brætspil";;
+diff_remember;diff_remember;Closed;Single;"Brætspilshistorik fortsat - Jeg oplever ofte at have svært ved at huske regler eller at komme til at sammenblande regler til brætspil";;
+id;id;Open;String;"Venligst indtast et unikt ID. Det kan være en kombination af bogstaver og tal.   Sørg derefter for at kopiere dit unikke ID.  VIGTIGT: Du skal indtaste det samme identiske ID i starten af den undersøgelse, som du bliver ledt videre til på næste side.";;
+email;email;Open;String;"E-mail";;
+statoverall;statoverall_1;Closed;Multiple;"Samlet status";1;"Ny"
+statoverall;statoverall_2;Closed;Multiple;"Samlet status";2;"Distribueret"
+statoverall;statoverall_3;Closed;Multiple;"Samlet status";3;"Nogen svar"
+statoverall;statoverall_4;Closed;Multiple;"Samlet status";4;"Gennemført"
+statoverall;statoverall_5;Closed;Multiple;"Samlet status";5;"Frafaldet"

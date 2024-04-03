@@ -1,5 +1,5 @@
 ---
-title: "Untitled"
+title: "Data cleaning"
 author: "Maria"
 date: "3/4/2024"
 output: html_document
@@ -12,16 +12,17 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 # packages
-pacman::p_load(tidyverse, lmerTest)
+pacman::p_load(tidyverse)
 ```
 
 Read experimental data
 
 ```{r, warning = FALSE}
 
+getwd()
 # list all csv files in the directory
 pavlovia <- list.files(
-  path = "C:/Users/maria/Downloads/pls_3",
+  path = "../data/raw data/experimental data",
   pattern = "*.csv",
   full.names = TRUE
 ) %>%
@@ -61,10 +62,6 @@ pavlovia <- list.files(
   ))
 
 
-
-# if you have specific levels for factors, you can specify them within the col_factor() function
-# col_factor(levels = NULL)
-
 # check to see ratio between condition A and B
 (length(unique(pavlovia$edited_character_resp.rt)) - 1) / 4
 (length(unique(pavlovia$original_character_resp.rt)) - 1) / 4
@@ -74,7 +71,7 @@ pavlovia <- list.files(
 Read survey data
 
 ```{r}
-temp_survey <- read_csv2("C:/Users/maria/Downloads/dataset_15-03.csv") %>% 
+survey <- read_csv2("../data/raw data/survey data/dataset.csv") %>% 
 
   # make labels intuitive based on translations from labels.csv
 
@@ -174,7 +171,7 @@ Merge dataframes and fix classes
 ```{r}
 # merge dataframes
 df <- merge(pavlovia, 
-            temp_survey) %>%
+            survey) %>%
   
   # compute missing binary column for correct responses for original character task
   mutate(original_character_resp.corr = ifelse(
@@ -559,7 +556,7 @@ rm(df,
    folder_path,
    i,
    pavlovia, 
-   temp_survey)
+   survey)
 
 ```
 
