@@ -11,7 +11,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ```{r}
-pacman::p_load(tidyverse)
+# packages
+pacman::p_load(tidyverse, lmerTest)
 ```
 
 Read experimental data
@@ -20,7 +21,7 @@ Read experimental data
 
 # list all csv files in the directory
 pavlovia <- list.files(
-  path = "C:/Users/maria/Downloads/pls_2",
+  path = "C:/Users/maria/Downloads/pls_3",
   pattern = "*.csv",
   full.names = TRUE
 ) %>%
@@ -68,7 +69,6 @@ pavlovia <- list.files(
 (length(unique(pavlovia$edited_character_resp.rt)) - 1) / 4
 (length(unique(pavlovia$original_character_resp.rt)) - 1) / 4
 
-class(pavlovia$token_edited_resp.corr)
 ```
 
 Read survey data
@@ -82,7 +82,7 @@ temp_survey <- read_csv2("C:/Users/maria/Downloads/dataset_15-03.csv") %>% # rea
   mutate(gender = as.factor(
     ifelse(gender == 1, "Female",
     ifelse(gender == 2, "Male",
-      "Other"
+                        "Other"
       )
     )
   )) %>%
@@ -91,7 +91,7 @@ temp_survey <- read_csv2("C:/Users/maria/Downloads/dataset_15-03.csv") %>% # rea
   mutate(colorblind = factor(
     ifelse(colorblind == 1, "Yes",
     ifelse(colorblind == 2, "No",
-      "Unsure"
+                            "Unsure"
       )
     ), 
     levels = c("No",
@@ -118,16 +118,16 @@ temp_survey <- read_csv2("C:/Users/maria/Downloads/dataset_15-03.csv") %>% # rea
       ifelse(freq_game == 2, "Monthly",
         ifelse(freq_game == 3, "Every 3rd month",
          ifelse(freq_game == 4, "Semi-annually",
-          "Rarely"
+                                  "Rarely"
           )
         )
       )
     ), 
     levels = c("Strongly disagree",
-                  "Disagree", 
-                  "Neither nor", 
-                  "Agree", 
-                  "Strongly agree")
+                "Disagree", 
+                "Neither nor", 
+                "Agree", 
+                "Strongly agree")
   )) %>%
   
   # difficulty understanding rules
@@ -142,10 +142,10 @@ temp_survey <- read_csv2("C:/Users/maria/Downloads/dataset_15-03.csv") %>% # rea
       )
     ), 
     levels = c("Strongly disagree",
-                  "Disagree", 
-                  "Neither nor", 
-                  "Agree", 
-                  "Strongly agree")
+               "Disagree",
+               "Neither nor",
+               "Agree",
+               "Strongly agree")
   )) %>%
   
   # difficulty remembering rules
@@ -160,10 +160,10 @@ temp_survey <- read_csv2("C:/Users/maria/Downloads/dataset_15-03.csv") %>% # rea
       )
     ), 
     levels = c("Strongly disagree",
-                  "Disagree", 
-                  "Neither nor", 
-                  "Agree", 
-                  "Strongly agree")
+               "Disagree",
+               "Neither nor",
+               "Agree",
+               "Strongly agree")
   )) 
 
 
@@ -502,15 +502,89 @@ df_icon <- df %>%
 
 ```
 
+Write cleaned data to csv files
 
+```{r}
+# path for cleaned data within working directory
+folder_path <- "cleaned data"
 
+# create the folder if it doesn't exist
+if (!file.exists(folder_path)) {
+  dir.create(folder_path)
+}
+
+# write dataframes to csv in the specified folder
+write.csv(df_seed, file.path(folder_path, "output_file.csv"), row.names = FALSE)
 
 ```
 
+Handle outliers and make data ready for modelling
+
 ```{r}
+# outlier cutoff 
+upper_bound <- mean(df_seed$seed_response.rt) + 3 * sd(df_seed$seed_response.rt) # upper boundary
+
+df_seed <- df_seed %>%
+  filter(seed_response.corr == 1) %>% # keep only correct answers
+  mutate(RT = ifelse(
+    seed_response.rt >= upper_bound, upper_bound, seed_response.rt)) # replace values exceeding the upper boundary 
+
+```
 
 
+Modeling
 
+```{r}
+# basic
+seed_m1 <- lmer(RT ~ 1 + manipulation + (1 |id), data = df_seed)
+seed_m2 <- lmer(RT ~ 1 + manipulation + (1 |freq_game:id) + (1|id), data = df_seed)
+
+seed_m2 <- lmer(RT ~ 1 + manipulation + age + (1 |id), data = df_seed)
+seed_m2 <- lmer(RT ~ 1 + manipulation + gender + (1 |id), data = df_seed)
+seed_m3 <- lmer(RT ~ 1 + manipulation + age + gender + (1 |id), data = df_seed)
+seed_m3 <- lmer(RT ~ 1 + manipulation + age + gender + board_color + (1 |id), data = df_seed)
+seed_m1 <- lmer(RT ~ 1 + manipulation + board_color + (1 |id), data = df_seed)
+
+# controlling for stimulus order
+seed_m1 <- lmer(RT ~ 1 + manipulation + trials_seeds.thisN + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + age + trials_seeds.thisN + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + gender + trials_seeds.thisN + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + (1 |id), data = df_seed)
+seed_m1 <- lmer(RT ~ 1 + manipulation + board_color + trials_seeds.thisN + (1 |id), data = df_seed)
+
+# controlling for response key
+seed_m1 <- lmer(RT ~ 1 + manipulation + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + age + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + gender + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed)
+seed_m1 <- lmer(RT ~ 1 + manipulation + board_color + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed)
+
+# controlling for having played the game
+seed_m1 <- lmer(RT ~ 1 + manipulation + trials_seeds.thisN + played_photo + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + age + trials_seeds.thisN + played_photo + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + gender + trials_seeds.thisN + played_photo + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + played_photo + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + played_photo + (1 |id), data = df_seed)
+seed_m1 <- lmer(RT ~ 1 + manipulation + board_color + trials_seeds.thisN + played_photo + (1 |id), data = df_seed)
+
+# controlling for frequency of gaming
+seed_m1 <- lmer(RT ~ 1 + manipulation + trials_seeds.thisN + freq_game + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + age + trials_seeds.thisN + freq_game + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + gender + trials_seeds.thisN + freq_game + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + freq_game + (1 |id), data = df_seed)
+seed_m2.5 <- lmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + freq_game + (1 |id), data = df_seed)
+seed_m1 <- lmer(RT ~ 1 + manipulation + board_color + trials_seeds.thisN + freq_game + (1 |id), data = df_seed)
+
+# consider controlling for colorblindness
+
+```
+
+
+Checking assumptions
+
+```{r}
 
 
 
