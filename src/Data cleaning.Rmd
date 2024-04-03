@@ -165,6 +165,8 @@ survey <- read_csv2("../data/raw data/survey data/dataset.csv") %>%
 
 ```
 
+Handle non-identical instances of ids
+
 ```{r}
 # fix id typos and handle æøå in preparation for merging
 
