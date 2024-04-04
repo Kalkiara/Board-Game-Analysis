@@ -176,6 +176,7 @@ survey <- survey %>%
   mutate(id = case_when(
     str_extract(id, ".{10}$") == "tspil33445" ~ "brætspil33445",
     str_extract(id, ".{5}$") == "NS112" ~ "HØNS112",
+    str_extract(id, "^.{7}") == "asdvkna" ~ "asdvknaæksjndvæjn",
     id == "111223" ~ "11123",
     
     TRUE ~ id # else retain the original id value
@@ -184,8 +185,9 @@ survey <- survey %>%
 # HØNS112 | H\xd8NS112
 # brætspil33445 | br\xe6tspil33445
 # 11123 | 111223
-```
+# asdvknaæksjndvæjn | asdvkna\xe6ksjndv\xe6jn
 
+```
 
 Merge dataframes and fix classes
 
