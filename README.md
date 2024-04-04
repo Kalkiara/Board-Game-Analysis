@@ -13,8 +13,9 @@ The organization of the project is as follows:
 |   └── raw data                   <- Folder containing raw data 
 |        ├── experimental data     <- Folder containing a csv file and compressed zip per participant with data from Pavlovia 
 |        └── survey data           <- Folder containing survey data 
-|            └── dataset.csv       <- File in csv format containing survey data
-|            └── labels.csv        <- File in csv format to translate analysis labels into meaningful levels
+|            ├── dataset.csv       <- File in csv format containing survey data
+|            ├── labels.csv        <- File in csv format to translate analysis labels into meaningful levels
+|            └── variables.csv     <- File in csv format which lists the phrases used in the questionnaire
 └── src                            <- The main folder for scripts
     ├── Data cleaning.Rmd          <- R Markdown for cleaning and restructuring the raw data in preparation for modelling
     └── Modelling.Rmd              <- R Markdown for modelling and statistical analysis
