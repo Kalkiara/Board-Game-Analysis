@@ -62,7 +62,9 @@ replace_outliers <- function(df_list, upper_bounds) {
     # adjust RT values
     df <- df %>%
       mutate(RT = ifelse(
-        RT >= upper_bounds[[i]], upper_bounds[[i]], RT)) # replace values exceeding the upper boundary
+        RT >= upper_bounds[[i]], upper_bounds[[i]], RT)) %>% # replace values exceeding the upper boundary
+      
+      filter(RT > 0.1) # exclude unrealistically fast response times
     
     return(df)
   })
@@ -135,52 +137,75 @@ rm(seed_density,
    icon_density)
 ```
 
+Plotting density distributions for logged response times
+
+```{r}
+# density plots of the distributions of outcome variables -- logged response times
+seed_density <- ggplot(df_seed, aes(x = log(RT))) +
+  geom_density(fill = "skyblue", color = "blue", alpha = 0.7) +
+  labs(title = "Seed - Response Time: Density Plot", x = "RT", y = "Density") +
+  theme_minimal()
+
+tree_density <- ggplot(df_trees, aes(x = log(RT))) +
+  geom_density(fill = "palegreen2", color = "palegreen4", alpha = 0.7) +
+  labs(title = "Trees - Response Time: Density Plot", x = "RT", y = "Density") +
+  theme_minimal()
+
+token_density <- ggplot(df_tokens, aes(x = log(RT))) +
+  geom_density(fill = "darkgoldenrod1", color = "darkgoldenrod", alpha = 0.7) +
+  labs(title = "Token - Response Time: Density Plot", x = "RT", y = "Density") +
+  theme_minimal()
+
+gaze_density <- ggplot(df_gaze, aes(x = log(RT))) +
+  geom_density(fill = "lightpink", color = "lightpink4", alpha = 0.7) +
+  labs(title = "Gaze - Response Time: Density Plot", x = "RT", y = "Density") +
+  theme_minimal()
+
+character_density <- ggplot(df_character, aes(x = log(RT))) +
+  geom_density(fill = "aquamarine", color = "aquamarine4", alpha = 0.7) +
+  labs(title = "Character - Response Time: Density Plot", x = "RT", y = "Density") +
+  theme_minimal()
+
+icon_density <- ggplot(df_icon, aes(x = log(RT))) +
+  geom_density(fill = "plum", color = "plum4", alpha = 0.7) +
+  labs(title = "Icon - Response Time: Density Plot", x = "RT", y = "Density") +
+  theme_minimal()
+
+# plot using patchwork
+denity_response_times <- 
+  (seed_density+tree_density)/
+  (token_density+gaze_density)/
+  (character_density+icon_density)
+
+denity_response_times
+
+rm(seed_density,
+   tree_density,
+   token_density,
+   gaze_density,
+   character_density,
+   icon_density)
+```
+
 Modelling: Task with seed tokens
 
 ```{r}
-# basic
-seed_m1 <- lmer(RT ~ 1 + manipulation + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-seed_m2 <- lmer(RT ~ 1 + manipulation + (1 |freq_game:id) + (1|id), data = df_seed, subset = seed_response.corr == "1")
-seed_m3 <- lmer(RT ~ 1 + manipulation + age + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-seed_m4 <- lmer(RT ~ 1 + manipulation + gender + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-seed_m5 <- lmer(RT ~ 1 + manipulation + age + gender + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-seed_m6 <- lmer(RT ~ 1 + manipulation + age + gender + board_color + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-seed_m7 <- lmer(RT ~ 1 + manipulation + board_color + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+# basic models
+seed_m1 <- lmer(log(RT) ~ 1 + manipulation + age + gender + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m2 <- lmer(log(RT) ~ 1 + manipulation + age + gender + board_color + (1 |id), data = df_seed, subset = seed_response.corr == "1")
 
-# controlling for stimulus order
-seed_m8 <- lmer(RT ~ 1 + manipulation + trials_seeds.thisN + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-seed_m9 <- lmer(RT ~ 1 + manipulation + age + trials_seeds.thisN + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-seed_m10 <- lmer(RT ~ 1 + manipulation + gender + trials_seeds.thisN + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-seed_m11 <- lmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-seed_m12 <- lmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-seed_m13 <- lmer(RT ~ 1 + manipulation + board_color + trials_seeds.thisN + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-
-# controlling for response key
-seed_m14 <- lmer(RT ~ 1 + manipulation + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-seed_m15 <- lmer(RT ~ 1 + manipulation + age + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-seed_m16 <- lmer(RT ~ 1 + manipulation + gender + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-seed_m17 <- lmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-seed_m18 <- lmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-seed_m19 <- lmer(RT ~ 1 + manipulation + board_color + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+# controlling for stimulus order and which key was pressed
+seed_m3 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_seeds.thisN + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m4 <- lmer(log(RT) ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m5 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m6 <- lmer(log(RT) ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed, subset = seed_response.corr == "1")
 
 # controlling for having played the game
-seed_m20 <- lmer(RT ~ 1 + manipulation + trials_seeds.thisN + played_photo + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-seed_m21 <- lmer(RT ~ 1 + manipulation + age + trials_seeds.thisN + played_photo + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-seed_m22 <- lmer(RT ~ 1 + manipulation + gender + trials_seeds.thisN + played_photo + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-seed_m23 <- lmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + played_photo + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-seed_m24 <- lmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + played_photo + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-seed_m25 <- lmer(RT ~ 1 + manipulation + board_color + trials_seeds.thisN + played_photo + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m7 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_seeds.thisN + played_photo + (1 |id), data = df_seed, subset = seed_response.corr == "1")
+seed_m8 <- lmer(log(RT) ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + played_photo + (1 |id), data = df_seed, subset = seed_response.corr == "1")
 
 # controlling for frequency of gaming
-seed_m26 <- lmer(RT ~ 1 + manipulation + trials_seeds.thisN + freq_game + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-seed_m27 <- lmer(RT ~ 1 + manipulation + age + trials_seeds.thisN + freq_game + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-seed_m28 <- lmer(RT ~ 1 + manipulation + gender + trials_seeds.thisN + freq_game + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-seed_m29 <- lmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + freq_game + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-seed_m30 <- lmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + freq_game + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-seed_m31 <- lmer(RT ~ 1 + manipulation + board_color + trials_seeds.thisN + freq_game + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-
-# consider controlling for colorblindness
-
+seed_m9 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_seeds.thisN + freq_game + (1 |id), data = df_seed, subset = seed_response.corr == "1")
 
 
 ```
@@ -188,6 +213,23 @@ seed_m31 <- lmer(RT ~ 1 + manipulation + board_color + trials_seeds.thisN + freq
 Modelling: Task with tree colors
 
 ```{r}
+# basic models
+tree_m1 <- lmer(log(RT) ~ 1 + manipulation + age + gender + (1 | id), data = df_trees, subset = tree_response.corr == "1")
+tree_m2 <- lmer(log(RT) ~ 1 + manipulation + age + gender + color_trees_to_count + (1 | id), data = df_trees, subset = tree_response.corr == "1")
+
+# controlling for stimulus order and which key was pressed
+tree_m3 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_tree.thisN + (1 | id), data = df_trees, subset = tree_response.corr == "1")
+tree_m4 <- lmer(log(RT) ~ 1 + manipulation + age + gender + color_trees_to_count + trials_tree.thisN + (1 | id), data = df_trees, subset = tree_response.corr == "1")
+tree_m5 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_tree.thisN + correctTreenumber + (1 | id), data = df_trees, subset = tree_response.corr == "1")
+tree_m6 <- lmer(log(RT) ~ 1 + manipulation + age + gender + color_trees_to_count + trials_tree.thisN + correctTreenumber + (1 | id), data = df_trees, subset = tree_response.corr == "1")
+
+# controlling for having played the game
+tree_m7 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_tree.thisN + played_photo + (1 | id), data = df_trees, subset = tree_response.corr == "1")
+tree_m8 <- lmer(log(RT) ~ 1 + manipulation + age + gender + color_trees_to_count + trials_tree.thisN + played_photo + (1 | id), data = df_trees, subset = tree_response.corr == "1")
+
+# controlling for frequency of gaming
+tree_m9 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_tree.thisN + freq_game + (1 | id), data = df_trees, subset = tree_response.corr == "1")
+
 
 ```
 
@@ -230,7 +272,8 @@ return(table)
 }
 
 # apply the function to each of the tasks/investigations
-seed_model_selection <- model_selection("seed_m", 31) 
+seed_model_selection <- model_selection("seed_m", 9) 
+tree_model_selection <- model_selection("tree_m", 9) 
 
 ```
 
@@ -240,8 +283,25 @@ Checking assumptions - residual plotting
 ```{r}
 # list of selected models
 models <- list(
-  seed_m1_trans = lmer(logRT ~ 1 + manipulation + age + trials_seeds.thisN + played_photo + (1 | id), data = df_seed, subset = seed_response.corr == "1"),
-  seed_m1_trans2 = lmer(logRT ~ 1 + manipulation + age + (1 | id), data = df_seed, subset = seed_response.corr == "1") 
+  # seed_alm = lmer(log(RT) ~ 1 + manipulation + age + gender + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed, subset = seed_response.corr == "1"),
+  
+  tree_m17 = lmer(log(RT) ~ 1 + manipulation + age + gender + trials_tree.thisN + correctTreenumber + (1 | id), data = df_trees, subset = tree_response.corr == "1"),
+  
+  tree_m17fam = glmer(RT ~ 1 + manipulation + age + gender + trials_tree.thisN + correctTreenumber + (1 | id), data = df_trees, subset = tree_response.corr == "1",
+                  family = inverse.gaussian(link = "log"))#,
+
+# seed_link = glmer(RT ~ 1 + manipulation + age + correctSeednumber + gender + trials_seeds.thisN + (1 | id), 
+#                   data = df_seed, 
+#                   subset = seed_response.corr == "1",
+#                   family = inverse.gaussian(link = "log")),
+# 
+# seed_m17 = glmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + correctSeednumber + (1 | id), 
+#                   data = df_seed, 
+#                   subset = seed_response.corr == "1",
+#                   family = Gamma(link = "log"))
+
+  # seed_m1_trans = lmer(logRT ~ 1 + manipulation + age + trials_seeds.thisN + played_photo + (1 | id), data = df_seed, subset = seed_response.corr == "1"),
+  # seed_m1_trans2 = lmer(logRT ~ 1 + manipulation + age + (1 | id), data = df_seed, subset = seed_response.corr == "1") 
 )
 
 # function to create residual plots 
@@ -273,12 +333,6 @@ plots <- lapply(names(models), function(model_name) {
   create_residual_plot(models[[model_name]], model_name)
 })
 
-custom_palette <- c("red", "green")
-# Loop through each plot and modify the color properties
-for (i in seq_along(plots)) {
-  plots[[i]] <- plots[[i]] + scale_color_manual(values = custom_palette[i])
-}
-
 # arrange plots in grid
 wrap_plots(plots)
 
@@ -288,7 +342,7 @@ QQ-plot
 
 ```{r}
 # Q-Q plot of residuals
-qqnorm(residuals(seed_m1_trans))
-qqline(residuals(seed_m1_trans))
+qqnorm(residuals(tree_m5))
+qqline(residuals(tree_m5))
 ```
 
