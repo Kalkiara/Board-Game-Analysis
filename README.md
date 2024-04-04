@@ -7,16 +7,19 @@ The organization of the project is as follows:
 
 
 ```
-├── README.md                <- The top-level README for this project
-├── data                     <- Folder containing behavioral data
-|   ├── xx                   <- xx
-|   └── xx                   <- xx
-├── src                      <- The main folder for scripts
-|   ├── xx                   <- For cleaning and restructuring the raw data in preparation for modelling
-|   └── xx                   <- xx
-├── .gitignore               <- A list of files not uploaded to git
-└── xx                       <- xx
+├── README.md                      <- The top-level README for this project
+├── data                           <- The main folder for data
+|   ├── cleaned data               <- Folder containing cleaned csv files for each task
+|   └── raw data                   <- Folder containing raw data 
+|        ├── experimental data     <- Folder containing a csv file and compressed zip per participant with data from Pavlovia 
+|        └── survey data           <- Folder containing survey data 
+|            └── dataset.csv       <- File in csv format containing survey data
+|            └── labels.csv        <- File in csv format to translate analysis labels into meaningful levels
+└── src                            <- The main folder for scripts
+    ├── Data cleaning.Rmd          <- R Markdown for cleaning and restructuring the raw data in preparation for modelling
+    └── Modelling.Rmd              <- R Markdown for modelling and statistical analysis
+
 ```
 
 ## Reproducibility
-You can run and reproduce the results by cloning the GitHub repository and running the xx script in R.
+You can run and reproduce the results by cloning the GitHub repository and running the Modelling.Rmd script in R.
