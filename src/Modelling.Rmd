@@ -87,6 +87,29 @@ rm(modified_dfs_list,
 
 ```
 
+trying things
+
+```{r}
+# df_seed2 <- df_seed %>% 
+#   rename(tree_response.corr = seed_response.corr,
+#          correctTreenumber = correctSeednumber,
+#          trials_tree.thisN = trials_seeds.thisN) %>% 
+#   select(RT, correctTreenumber, trials_tree.thisN, tree_response.corr, id, manipulation, age, gender) %>% 
+#   mutate(task = "seed")
+# 
+# df_trees2 <- df_trees %>% 
+#   select(RT, correctTreenumber, trials_tree.thisN, tree_response.corr, id, manipulation, age, gender)%>% 
+#   mutate(task = "tree")
+# 
+# t <- rbind(df_trees2, df_seed2)
+# 
+# test1 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_tree.thisN + correctTreenumber + (1 | id), data = t, subset = tree_response.corr == "1")
+# test2 <- lmer(log(RT) ~ 1 + task + manipulation + age + gender + trials_tree.thisN + correctTreenumber + (1 | id), data = t, subset = tree_response.corr == "1")
+# 
+# # if some is within and some is between, can in be modelled in one go?
+```
+
+
 Plotting density distributions for response times
 
 ```{r}
@@ -210,6 +233,49 @@ seed_m9 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_seeds.thisN +
 
 ```
 
+
+```{r}
+
+# Define GLMMs with logit link function
+seed_m1 <- glmer(RT ~ 1 + manipulation + age + gender + (1 | id), 
+                 data = df_seed, 
+                 family = gaussian(link = "logit"))
+
+seed_m2 <- glmer(RT ~ 1 + manipulation + age + gender + board_color + (1 | id), 
+                 data = df_seed, 
+                 family = gaussian(link = "logit"))
+
+seed_m3 <- glmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + (1 | id), 
+                 data = df_seed, 
+                 family = gaussian(link = "logit"))
+
+seed_m4 <- glmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + (1 | id), 
+                 data = df_seed, 
+                 family = gaussian(link = "logit"))
+
+seed_m5 <- glmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + correctSeednumber + (1 | id), 
+                 data = df_seed, 
+                 family = gaussian(link = "logit"))
+
+seed_m6 <- glmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + correctSeednumber + (1 | id), 
+                 data = df_seed, 
+                 family = gaussian(link = "logit"))
+
+seed_m7 <- glmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + played_photo + (1 | id), 
+                 data = df_seed, 
+                 family = gaussian(link = "logit"))
+
+seed_m8 <- glmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + played_photo + (1 | id), 
+                 data = df_seed, 
+                 family = gaussian(link = "logit"))
+
+seed_m9 <- glmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + freq_game + (1 | id), 
+                 data = df_seed, 
+                 family = gaussian(link = "logit"))
+
+
+```
+
 Modelling: Task with tree colors
 
 ```{r}
@@ -233,6 +299,92 @@ tree_m9 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_tree.thisN + 
 
 ```
 
+Modelling: Task with token symbols
+
+```{r}
+# basic models
+token_m1 <- lmer(log(RT) ~ 1 + manipulation + age + gender + (1 | id), data = df_tokens, subset = token_resp.corr == "1")
+token_m2 <- lmer(log(RT) ~ 1 + manipulation + age + gender + token_color + (1 | id), data = df_tokens, subset = token_resp.corr == "1")
+
+# controlling for stimulus order and which key was pressed
+token_m3 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_tokens.thisN + (1 | id), data = df_tokens, subset = token_resp.corr == "1")
+token_m4 <- lmer(log(RT) ~ 1 + manipulation + age + gender + token_color + trials_tokens.thisN + (1 | id), data = df_tokens, subset = token_resp.corr == "1")
+token_m5 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_tokens.thisN + correct_token_options + (1 | id), data = df_tokens, subset = token_resp.corr == "1")
+
+# rank deficincy when including both key-press and token color in the same model -- skipping this one
+
+# controlling for having played the game
+token_m6 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_tokens.thisN + played_haven + (1 | id), data = df_tokens, subset = token_resp.corr == "1")
+token_m7 <- lmer(log(RT) ~ 1 + manipulation + age + gender + token_color + trials_tokens.thisN + played_haven + (1 | id), data = df_tokens, subset = token_resp.corr == "1")
+
+# controlling for frequency of gaming
+token_m8 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_tokens.thisN + freq_game + (1 | id), data = df_tokens, subset = token_resp.corr == "1")
+
+```
+
+Modelling: Task with gaze direction
+
+```{r}
+# basic models
+gaze_m1 <- lmer(log(RT) ~ 1 + manipulation + age + gender + (1 | id), data = df_gaze, subset = gaze_response.corr == "1")
+gaze_m2 <- lmer(log(RT) ~ 1 + manipulation + age + gender + stimulus_type + (1 | id), data = df_gaze, subset = gaze_response.corr == "1")
+
+# controlling for stimulus order, stimulus type and/or which key was pressed
+gaze_m3 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_gaze.thisN + (1 | id), data = df_gaze, subset = gaze_response.corr == "1")
+gaze_m4 <- lmer(log(RT) ~ 1 + manipulation + age + gender + stimulus_type + trials_gaze.thisN + (1 | id), data = df_gaze, subset = gaze_response.corr == "1")
+gaze_m5 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_gaze.thisN + correctGazeanswer + (1 | id), data = df_gaze, subset = gaze_response.corr == "1")
+
+
+# controlling for having played the game
+gaze_m6 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_gaze.thisN + played_tang + (1 | id), data = df_gaze, subset = gaze_response.corr == "1")
+gaze_m7 <- lmer(log(RT) ~ 1 + manipulation + age + gender + stimulus_type + trials_gaze.thisN + played_tang + (1 | id), data = df_gaze, subset = gaze_response.corr == "1")
+
+# controlling for frequency of gaming
+gaze_m8 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_gaze.thisN + freq_game + (1 | id), data = df_gaze, subset = gaze_response.corr == "1")
+
+```
+
+Modelling: Task with icon matching 
+
+```{r}
+# basic models
+icon_m1 <- lmer(log(RT) ~ 1 + manipulation + age + gender + (1 | id), data = df_icon, subset = icon_resp.corr == "1")
+
+# controlling for stimulus order and which key was pressed
+icon_m2 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials.thisN + (1 | id), data = df_icon, subset = icon_resp.corr == "1")
+icon_m3 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials.thisN + correct_landscape_options + (1 | id), data = df_icon, subset = icon_resp.corr == "1")
+
+# controlling for having played the game
+icon_m4 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials.thisN + played_tang + (1 | id), data = df_icon, subset = icon_resp.corr == "1")
+
+# controlling for frequency of gaming
+icon_m5 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials.thisN + freq_game + (1 | id), data = df_icon, subset = icon_resp.corr == "1")
+
+```
+
+Modelling: Task with character matching
+
+```{r}
+# basic models
+character_m1 <- lmer(log(RT) ~ 1 + manipulation + age + gender + (1 | id), data = df_character, subset = character_resp.corr == "1")
+character_m2 <- lmer(log(RT) ~ 1 + manipulation + age + gender + character_type + (1 | id), data = df_character, subset = character_resp.corr == "1")
+
+# controlling for stimulus order and which key was pressed
+character_m3 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_character.thisN + (1 | id), data = df_character, subset = character_resp.corr == "1")
+character_m4 <- lmer(log(RT) ~ 1 + manipulation + age + gender + character_type + trials_character.thisN + (1 | id), data = df_character, subset = character_resp.corr == "1")
+character_m5 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_character.thisN + correct_character_options + (1 | id), data = df_character, subset = character_resp.corr == "1")
+
+
+# controlling for having played the game
+character_m6 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_character.thisN + played_tang + (1 | id), data = df_character, subset = character_resp.corr == "1")
+character_m7 <- lmer(log(RT) ~ 1 + manipulation + age + gender + character_type + trials_character.thisN + played_tang + (1 | id), data = df_character, subset = character_resp.corr == "1")
+
+# controlling for frequency of gaming
+character_m8 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_character.thisN + freq_game + (1 | id), data = df_character, subset = character_resp.corr == "1")
+
+```
+
+Model selection
 
 ```{r}
 # make function for assessing AIC and BIC for various model fits
@@ -274,35 +426,48 @@ return(table)
 # apply the function to each of the tasks/investigations
 seed_model_selection <- model_selection("seed_m", 9) 
 tree_model_selection <- model_selection("tree_m", 9) 
+token_model_selection <- model_selection("token_m", 8) 
+gaze_model_selection <- model_selection("gaze_m", 8) 
+icon_model_selection <- model_selection("icon_m", 5) 
+character_model_selection <- model_selection("character_m", 8) 
 
 ```
 
+Clean up environment after deciding on which models to go with. For all models, this is assessed manually by looking at AIC and BIC values.
+
+
+     - chosen models: character_m3, character_accuracy_m2, gaze_m4, icon_m2, seed_m5, token_m3, tree_m3
+      
+```{r}
+# variables to keep
+variables_to_keep <- c("df_character", "df_gaze", "df_icon", "df_seed", "df_tokens", "df_trees",
+                       
+                       "character_model_selection", "gaze_model_selection", 
+                       "icon_model_selection", "seed_model_selection", 
+                       "token_model_selection", "tree_model_selection",
+                       
+                       "character_m3", "gaze_m4", "icon_m2", 
+                       "seed_m5", "token_m3", "tree_m3")
+
+# remove all variables except those in the list
+rm(list = setdiff(ls(), variables_to_keep))
+
+```
 
 Checking assumptions - residual plotting
 
 ```{r}
 # list of selected models
 models <- list(
-  # seed_alm = lmer(log(RT) ~ 1 + manipulation + age + gender + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed, subset = seed_response.corr == "1"),
-  
-  tree_m17 = lmer(log(RT) ~ 1 + manipulation + age + gender + trials_tree.thisN + correctTreenumber + (1 | id), data = df_trees, subset = tree_response.corr == "1"),
-  
-  tree_m17fam = glmer(RT ~ 1 + manipulation + age + gender + trials_tree.thisN + correctTreenumber + (1 | id), data = df_trees, subset = tree_response.corr == "1",
-                  family = inverse.gaussian(link = "log"))#,
 
-# seed_link = glmer(RT ~ 1 + manipulation + age + correctSeednumber + gender + trials_seeds.thisN + (1 | id), 
-#                   data = df_seed, 
-#                   subset = seed_response.corr == "1",
-#                   family = inverse.gaussian(link = "log")),
-# 
-# seed_m17 = glmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + correctSeednumber + (1 | id), 
-#                   data = df_seed, 
-#                   subset = seed_response.corr == "1",
-#                   family = Gamma(link = "log"))
-
-  # seed_m1_trans = lmer(logRT ~ 1 + manipulation + age + trials_seeds.thisN + played_photo + (1 | id), data = df_seed, subset = seed_response.corr == "1"),
-  # seed_m1_trans2 = lmer(logRT ~ 1 + manipulation + age + (1 | id), data = df_seed, subset = seed_response.corr == "1") 
+  character_m3 = lmer(log(RT) ~ 1 + manipulation + age + gender + trials_character.thisN + (1 | id), data = df_character, subset = character_resp.corr == "1"),
+  gaze_m4 = lmer(log(RT) ~ 1 + manipulation + age + gender + stimulus_type + trials_gaze.thisN + (1 | id), data = df_gaze, subset = gaze_response.corr == "1"),
+  icon_m2 = lmer(log(RT) ~ 1 + manipulation + age + gender + trials.thisN + (1 | id), data = df_icon, subset = icon_resp.corr == "1"),
+  seed_m5 = lmer(log(RT) ~ 1 + manipulation + age + gender + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed, subset = seed_response.corr == "1"),
+  token_m3 = lmer(log(RT) ~ 1 + manipulation + age + gender + trials_tokens.thisN + (1 | id), data = df_tokens, subset = token_resp.corr == "1"),
+  tree_m3 = lmer(log(RT) ~ 1 + manipulation + age + gender + trials_tree.thisN + (1 | id), data = df_trees, subset = tree_response.corr == "1")
 )
+
 
 # function to create residual plots 
 create_residual_plot <- function(model, 
@@ -345,4 +510,13 @@ QQ-plot
 qqnorm(residuals(tree_m5))
 qqline(residuals(tree_m5))
 ```
+```{r}
+# assess using qq plot
+ggplot(df_gaze, aes(sample = log(RT)))+ stat_qq()+
+stat_qq_line(colour = 'red')+
+ggtitle('Comparing to a normal distribution')+ labs(x = 'Expected values', y = 'Observed values')
+
+```
+
+
 
