@@ -233,45 +233,51 @@ seed_m9 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_seeds.thisN +
 
 ```
 
+Using generalized modelling
 
 ```{r}
 
 # Define GLMMs with logit link function
-seed_m1 <- glmer(RT ~ 1 + manipulation + age + gender + (1 | id), 
-                 data = df_seed, 
-                 family = gaussian(link = "logit"))
+seed_m1 <- glmer(RT ~ 1 + manipulation + age + gender + (1 | id),
+                 data = df_seed,
+                 family = inverse.gaussian(link = "identity"),
+                 control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 1000000)))
 
 seed_m2 <- glmer(RT ~ 1 + manipulation + age + gender + board_color + (1 | id), 
                  data = df_seed, 
-                 family = gaussian(link = "logit"))
+                 family = inverse.gaussian(link = "identity"))
 
 seed_m3 <- glmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + (1 | id), 
                  data = df_seed, 
-                 family = gaussian(link = "logit"))
+                 family = inverse.gaussian(link = "identity"))
 
 seed_m4 <- glmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + (1 | id), 
                  data = df_seed, 
-                 family = gaussian(link = "logit"))
+                 family = inverse.gaussian(link = "identity"))
+# 
+# seed_m5 <- glmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + correctSeednumber + (1 | id),
+#                  data = df_seed,
+#                  family = inverse.gaussian(link = "identity"),
+#                  control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 1000000)))
 
-seed_m5 <- glmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + correctSeednumber + (1 | id), 
-                 data = df_seed, 
-                 family = gaussian(link = "logit"))
+seed_m5 <- glmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + correctSeednumber + (1 | id),
+                 data = df_seed,
+                 family = inverse.gaussian(link = "identity"),
+                 control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000)))
 
-seed_m6 <- glmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + correctSeednumber + (1 | id), 
-                 data = df_seed, 
-                 family = gaussian(link = "logit"))
+# seed_m6 <- glmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + played_photo + (1 | id), 
+#                  data = df_seed, 
+#                  family = inverse.gaussian(link = "identity"))
 
-seed_m7 <- glmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + played_photo + (1 | id), 
+seed_m6 <- glmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + played_photo + (1 | id), 
                  data = df_seed, 
-                 family = gaussian(link = "logit"))
+                 family = inverse.gaussian(link = "identity"),
+                 control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000)))
 
-seed_m8 <- glmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + played_photo + (1 | id), 
+seed_m7 <- glmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + freq_game + (1 | id), 
                  data = df_seed, 
-                 family = gaussian(link = "logit"))
-
-seed_m9 <- glmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + freq_game + (1 | id), 
-                 data = df_seed, 
-                 family = gaussian(link = "logit"))
+                 family = inverse.gaussian(link = "identity"),
+                 control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000)))
 
 
 ```
@@ -299,6 +305,66 @@ tree_m9 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_tree.thisN + 
 
 ```
 
+
+```{r}
+
+# basic models
+tree_m1 <- glmer(RT ~ 1 + manipulation + age + gender + (1 | id), 
+                 data = df_trees, 
+                 subset = tree_response.corr == "1", 
+                 family = inverse.gaussian(link = "identity"))
+
+tree_m2 <- glmer(RT ~ 1 + manipulation + age + gender + color_trees_to_count + (1 | id), 
+                 data = df_trees, 
+                 subset = tree_response.corr == "1", 
+                 family = inverse.gaussian(link = "identity"),
+                 control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000)))
+
+# controlling for stimulus order and which key was pressed
+tree_m3 <- glmer(RT ~ 1 + manipulation + age + gender + trials_tree.thisN + (1 | id), 
+                 data = df_trees, 
+                 subset = tree_response.corr == "1", 
+                 family = inverse.gaussian(link = "identity"))
+
+tree_m4 <- glmer(RT ~ 1 + manipulation + age + gender + color_trees_to_count + trials_tree.thisN + (1 | id), 
+                 data = df_trees, 
+                 subset = tree_response.corr == "1", 
+                 family = inverse.gaussian(link = "identity"),
+                 control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000)))
+
+tree_m5 <- glmer(RT ~ 1 + manipulation + age + gender + trials_tree.thisN + correctTreenumber + (1 | id), 
+                 data = df_trees, 
+                 subset = tree_response.corr == "1", 
+                 family = inverse.gaussian(link = "identity"),
+                 control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000)))
+
+tree_m6 <- glmer(RT ~ 1 + manipulation + age + gender + color_trees_to_count + trials_tree.thisN + correctTreenumber + (1 | id), 
+                 data = df_trees, 
+                 subset = tree_response.corr == "1", 
+                 family = inverse.gaussian(link = "identity"),
+                 control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000)))
+
+# controlling for having played the game
+tree_m7 <- glmer(RT ~ 1 + manipulation + age + gender + trials_tree.thisN + played_photo + (1 | id), 
+                 data = df_trees, 
+                 subset = tree_response.corr == "1", 
+                 family = inverse.gaussian(link = "identity"))
+
+tree_m8 <- glmer(RT ~ 1 + manipulation + age + gender + color_trees_to_count + trials_tree.thisN + played_photo + (1 | id), 
+                 data = df_trees, 
+                 subset = tree_response.corr == "1", 
+                 family = inverse.gaussian(link = "identity"),
+                 control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000)))
+
+# controlling for frequency of gaming
+tree_m9 <- glmer(RT ~ 1 + manipulation + age + gender + trials_tree.thisN + freq_game + (1 | id), 
+                 data = df_trees, 
+                 subset = tree_response.corr == "1", 
+                 family = inverse.gaussian(link = "identity"),
+                 control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000)))
+
+```
+
 Modelling: Task with token symbols
 
 ```{r}
@@ -319,6 +385,56 @@ token_m7 <- lmer(log(RT) ~ 1 + manipulation + age + gender + token_color + trial
 
 # controlling for frequency of gaming
 token_m8 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_tokens.thisN + freq_game + (1 | id), data = df_tokens, subset = token_resp.corr == "1")
+
+```
+
+
+```{r}
+# basic models
+token_m1 <- glmer(RT ~ 1 + manipulation + age + gender + (1 | id), 
+                  data = df_tokens, 
+                  subset = token_resp.corr == "1", 
+                  family = inverse.gaussian(link = "identity"))
+
+token_m2 <- glmer(RT ~ 1 + manipulation + age + gender + token_color + (1 | id), 
+                  data = df_tokens, 
+                  subset = token_resp.corr == "1", 
+                  family = inverse.gaussian(link = "identity"))
+
+# controlling for stimulus order and which key was pressed
+token_m3 <- glmer(RT ~ 1 + manipulation + age + gender + trials_tokens.thisN + (1 | id), 
+                  data = df_tokens, 
+                  subset = token_resp.corr == "1", 
+                  family = inverse.gaussian(link = "identity"))
+
+token_m4 <- glmer(RT ~ 1 + manipulation + age + gender + token_color + trials_tokens.thisN + (1 | id), 
+                  data = df_tokens, 
+                  subset = token_resp.corr == "1", 
+                  family = inverse.gaussian(link = "identity"))
+
+token_m5 <- glmer(RT ~ 1 + manipulation + age + gender + trials_tokens.thisN + correct_token_options + (1 | id), 
+                  data = df_tokens, 
+                  subset = token_resp.corr == "1", 
+                  family = inverse.gaussian(link = "identity"),
+                  control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000)))
+
+# controlling for having played the game
+token_m6 <- glmer(RT ~ 1 + manipulation + age + gender + trials_tokens.thisN + played_haven + (1 | id), 
+                  data = df_tokens, 
+                  subset = token_resp.corr == "1", 
+                  family = inverse.gaussian(link = "identity"))
+
+token_m7 <- glmer(RT ~ 1 + manipulation + age + gender + token_color + trials_tokens.thisN + played_haven + (1 | id), 
+                  data = df_tokens, 
+                  subset = token_resp.corr == "1", 
+                  family = inverse.gaussian(link = "identity"))
+
+# controlling for frequency of gaming
+token_m8 <- glmer(RT ~ 1 + manipulation + age + gender + trials_tokens.thisN + freq_game + (1 | id), 
+                  data = df_tokens, 
+                  subset = token_resp.corr == "1", 
+                  family = inverse.gaussian(link = "identity"),
+                  control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000)))
 
 ```
 
@@ -344,6 +460,58 @@ gaze_m8 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_gaze.thisN + 
 
 ```
 
+```{r}
+# basic models
+gaze_m1 <- glmer(RT ~ 1 + manipulation + age + gender + (1 | id), 
+                 data = df_gaze, 
+                 subset = gaze_response.corr == "1", 
+                 family = inverse.gaussian(link = "identity"))
+
+gaze_m2 <- glmer(RT ~ 1 + manipulation + age + gender + stimulus_type + (1 | id), 
+                 data = df_gaze, 
+                 subset = gaze_response.corr == "1", 
+                 family = inverse.gaussian(link = "identity"),
+                 control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000)))
+
+# controlling for stimulus order, stimulus type, and/or which key was pressed
+gaze_m3 <- glmer(RT ~ 1 + manipulation + age + gender + trials_gaze.thisN + (1 | id), 
+                 data = df_gaze, 
+                 subset = gaze_response.corr == "1", 
+                 family = inverse.gaussian(link = "identity"))
+
+gaze_m4 <- glmer(RT ~ 1 + manipulation + age + gender + stimulus_type + trials_gaze.thisN + (1 | id), 
+                 data = df_gaze, 
+                 subset = gaze_response.corr == "1", 
+                 family = inverse.gaussian(link = "identity"),
+                 control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000)))
+
+gaze_m5 <- glmer(RT ~ 1 + manipulation + age + gender + trials_gaze.thisN + correctGazeanswer + (1 | id), 
+                 data = df_gaze, 
+                 subset = gaze_response.corr == "1", 
+                 family = inverse.gaussian(link = "identity"),
+                 control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000)))
+
+# controlling for having played the game
+gaze_m6 <- glmer(RT ~ 1 + manipulation + age + gender + trials_gaze.thisN + played_tang + (1 | id), 
+                 data = df_gaze, 
+                 subset = gaze_response.corr == "1", 
+                 family = inverse.gaussian(link = "identity"))
+
+gaze_m7 <- glmer(RT ~ 1 + manipulation + age + gender + stimulus_type + trials_gaze.thisN + played_tang + (1 | id), 
+                 data = df_gaze, 
+                 subset = gaze_response.corr == "1", 
+                 family = inverse.gaussian(link = "identity"),
+                 control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000)))
+
+# controlling for frequency of gaming
+gaze_m8 <- glmer(RT ~ 1 + manipulation + age + gender + trials_gaze.thisN + freq_game + (1 | id), 
+                 data = df_gaze, 
+                 subset = gaze_response.corr == "1", 
+                 family = inverse.gaussian(link = "identity"),
+                 control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000)))
+
+```
+
 Modelling: Task with icon matching 
 
 ```{r}
@@ -361,6 +529,53 @@ icon_m4 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials.thisN + playe
 icon_m5 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials.thisN + freq_game + (1 | id), data = df_icon, subset = icon_resp.corr == "1")
 
 ```
+
+Two-part model specification starting with modelling the fixed effects, based on the following issue on gitHub: https://github.com/lme4/lme4/issues/573
+
+```{r}
+# basic models
+icon_m1_fixef <- glm(RT ~ 1 + manipulation + age + gender, 
+          data = df_icon,
+          subset = icon_resp.corr == "1", 
+          family = Gamma(link = "identity"))
+
+icon_m1 <- glmer(RT ~ 1 + manipulation + age + gender + (1 | id), 
+            data = df_icon,
+            subset = icon_resp.corr == "1", 
+            family = Gamma(link = "identity"),
+            start = list(fixef=coef(icon_m1_fixef)),
+            control = glmerControl(nAGQ0initStep=FALSE),
+            verbose = 100)
+
+# controlling for stimulus order 
+icon_m2_fixef <- glm(RT ~ 1 + manipulation + trials.thisN,
+          data = df_icon,
+          subset = icon_resp.corr == "1",
+          family = Gamma(link = "identity"))
+
+icon_m2 <- glmer(RT ~ 1 + manipulation + trials.thisN + (1 | id),
+                 data = df_icon,
+                 subset = icon_resp.corr == "1",
+                 family = inverse.gaussian(link = "identity"),
+                 start = list(fixef=coef(icon_m2_fixef)),
+                 control = glmerControl(optimizer = "bobyqa", nAGQ0initStep=FALSE, optCtrl = list(maxfun = 100000)),
+                 verbose = 100)
+
+# icon_m3_fixef <- glm(RT ~ 1 + manipulation + trials.thisN + gender + age,
+#           data = df_icon,
+#           subset = icon_resp.corr == "1",
+#           family = Gamma(link = "identity"))
+# 
+# icon_m3 <- glmer(RT ~ 1 + manipulation + trials.thisN + gender + age + (1 | id),
+#                  data = df_icon,
+#                  subset = icon_resp.corr == "1",
+#                  family = inverse.gaussian(link = "identity"),
+#                  start = list(fixef=coef(icon_m3_fixef)),
+#                  control = glmerControl(optimizer = "bobyqa", nAGQ0initStep=FALSE, optCtrl = list(maxfun = 100000)),
+#                  verbose = 100)
+
+```
+
 
 Modelling: Task with character matching
 
@@ -381,6 +596,82 @@ character_m7 <- lmer(log(RT) ~ 1 + manipulation + age + gender + character_type 
 
 # controlling for frequency of gaming
 character_m8 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_character.thisN + freq_game + (1 | id), data = df_character, subset = character_resp.corr == "1")
+
+```
+
+```{r}
+# basic models
+character_m1 <- glmer(RT ~ 1 + manipulation + age + gender + 
+                      (1 | id), 
+                      data = df_character, 
+                      subset = character_resp.corr == "1", 
+                      family = inverse.gaussian(link = "identity"))
+
+character_m2 <- glmer(RT ~ 1 + manipulation + age + gender + 
+                      character_type + 
+                      (1 | id), 
+                      data = df_character, 
+                      subset = character_resp.corr == "1", 
+                      family = inverse.gaussian(link = "identity"))
+
+# controlling for stimulus order and which key was pressed
+character_m3_fixef <- glm(RT ~ 1 + manipulation + age + gender + trials_character.thisN, 
+          data = df_character,
+          subset = character_resp.corr == "1", 
+          family = Gamma(link = "identity"))
+
+# character_m3 <- glmer(RT ~ 1 + manipulation + age + gender + trials_character.thisN + (1 | id), 
+#             data = df_character,
+#             subset = character_resp.corr == "1", 
+#             family = Gamma(link = "identity"),
+#             start = list(fixef=coef(character_m3_fixef)),
+#             control = glmerControl(optimizer = "bobyqa", nAGQ0initStep=FALSE, optCtrl = list(maxfun = 100000)),
+#             verbose = 100)
+
+
+
+
+character_m4 <- glmer(RT ~ 1 + manipulation + age + gender + 
+                      character_type + trials_character.thisN + 
+                      (1 | id), 
+                      data = df_character, 
+                      subset = character_resp.corr == "1", 
+                      family = inverse.gaussian(link = "identity"),
+                      control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000)))
+
+character_m5 <- glmer(RT ~ 1 + manipulation + age + gender + 
+                      trials_character.thisN + correct_character_options + 
+                      (1 | id), 
+                      data = df_character, 
+                      subset = character_resp.corr == "1", 
+                      family = inverse.gaussian(link = "identity"),
+                      control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000)))
+
+# controlling for having played the game
+character_m6 <- glmer(RT ~ 1 + manipulation + age + gender + 
+                      trials_character.thisN + played_tang + 
+                      (1 | id), 
+                      data = df_character, 
+                      subset = character_resp.corr == "1", 
+                      family = inverse.gaussian(link = "identity"),
+                      control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000)))
+
+character_m7 <- glmer(RT ~ 1 + manipulation + age + gender + 
+                      character_type + trials_character.thisN + played_tang + 
+                      (1 | id), 
+                      data = df_character, 
+                      subset = character_resp.corr == "1", 
+                      family = inverse.gaussian(link = "identity"),
+                      control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000)))
+
+# controlling for frequency of gaming
+character_m8 <- glmer(RT ~ 1 + manipulation + age + gender + 
+                      trials_character.thisN + freq_game + 
+                      (1 | id), 
+                      data = df_character, 
+                      subset = character_resp.corr == "1", 
+                      family = inverse.gaussian(link = "identity"),
+                      control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000)))
 
 ```
 
@@ -424,11 +715,11 @@ return(table)
 }
 
 # apply the function to each of the tasks/investigations
-seed_model_selection <- model_selection("seed_m", 9) 
+seed_model_selection <- model_selection("seed_m", 7) 
 tree_model_selection <- model_selection("tree_m", 9) 
 token_model_selection <- model_selection("token_m", 8) 
 gaze_model_selection <- model_selection("gaze_m", 8) 
-icon_model_selection <- model_selection("icon_m", 5) 
+icon_model_selection <- model_selection("icon_m", 2) 
 character_model_selection <- model_selection("character_m", 8) 
 
 ```
@@ -459,7 +750,23 @@ Checking assumptions - residual plotting
 ```{r}
 # list of selected models
 models <- list(
-
+  
+  icon_m2 = glmer(RT ~ 1 + manipulation + trials.thisN + (1 | id),
+                 data = df_icon,
+                 subset = icon_resp.corr == "1",
+                 family = inverse.gaussian(link = "identity"),
+                 start = list(fixef=coef(icon_m2_fixef)),
+                 control = glmerControl(optimizer = "bobyqa", nAGQ0initStep=FALSE, optCtrl = list(maxfun = 100000)),
+                 verbose = 100),
+  seed_m5_glmer = glmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + correctSeednumber + (1 | id),
+                 data = df_seed,
+                 family = inverse.gaussian(link = "identity"),
+                 control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000))),
+  tree_m6_glmer = glmer(RT ~ 1 + manipulation + age + gender + color_trees_to_count + trials_tree.thisN + correctTreenumber + (1 | id), 
+                 data = df_trees, 
+                 subset = tree_response.corr == "1", 
+                 family = inverse.gaussian(link = "identity"),
+                 control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000))),
   character_m3 = lmer(log(RT) ~ 1 + manipulation + age + gender + trials_character.thisN + (1 | id), data = df_character, subset = character_resp.corr == "1"),
   gaze_m4 = lmer(log(RT) ~ 1 + manipulation + age + gender + stimulus_type + trials_gaze.thisN + (1 | id), data = df_gaze, subset = gaze_response.corr == "1"),
   icon_m2 = lmer(log(RT) ~ 1 + manipulation + age + gender + trials.thisN + (1 | id), data = df_icon, subset = icon_resp.corr == "1"),
