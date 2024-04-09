@@ -601,77 +601,29 @@ character_m8 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_characte
 
 ```{r}
 # basic models
-character_m1 <- glmer(RT ~ 1 + manipulation + age + gender + 
-                      (1 | id), 
+character_m1 <- glmer(RT ~ 1 + manipulation + age + gender + (1 | id), 
                       data = df_character, 
                       subset = character_resp.corr == "1", 
                       family = inverse.gaussian(link = "identity"))
 
-character_m2 <- glmer(RT ~ 1 + manipulation + age + gender + 
-                      character_type + 
-                      (1 | id), 
+character_m2 <- glmer(RT ~ 1 + manipulation + age + gender + character_type + (1 | id), 
                       data = df_character, 
                       subset = character_resp.corr == "1", 
                       family = inverse.gaussian(link = "identity"))
 
-# controlling for stimulus order and which key was pressed
-character_m3_fixef <- glm(RT ~ 1 + manipulation + age + gender + trials_character.thisN, 
+# controlling for stimulus order 
+character_m3_fixef <- glm(RT ~ 1 + manipulation + trials_character.thisN, 
           data = df_character,
           subset = character_resp.corr == "1", 
           family = Gamma(link = "identity"))
 
-# character_m3 <- glmer(RT ~ 1 + manipulation + age + gender + trials_character.thisN + (1 | id), 
-#             data = df_character,
-#             subset = character_resp.corr == "1", 
-#             family = Gamma(link = "identity"),
-#             start = list(fixef=coef(character_m3_fixef)),
-#             control = glmerControl(optimizer = "bobyqa", nAGQ0initStep=FALSE, optCtrl = list(maxfun = 100000)),
-#             verbose = 100)
-
-
-
-
-character_m4 <- glmer(RT ~ 1 + manipulation + age + gender + 
-                      character_type + trials_character.thisN + 
-                      (1 | id), 
-                      data = df_character, 
-                      subset = character_resp.corr == "1", 
-                      family = inverse.gaussian(link = "identity"),
-                      control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000)))
-
-character_m5 <- glmer(RT ~ 1 + manipulation + age + gender + 
-                      trials_character.thisN + correct_character_options + 
-                      (1 | id), 
-                      data = df_character, 
-                      subset = character_resp.corr == "1", 
-                      family = inverse.gaussian(link = "identity"),
-                      control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000)))
-
-# controlling for having played the game
-character_m6 <- glmer(RT ~ 1 + manipulation + age + gender + 
-                      trials_character.thisN + played_tang + 
-                      (1 | id), 
-                      data = df_character, 
-                      subset = character_resp.corr == "1", 
-                      family = inverse.gaussian(link = "identity"),
-                      control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000)))
-
-character_m7 <- glmer(RT ~ 1 + manipulation + age + gender + 
-                      character_type + trials_character.thisN + played_tang + 
-                      (1 | id), 
-                      data = df_character, 
-                      subset = character_resp.corr == "1", 
-                      family = inverse.gaussian(link = "identity"),
-                      control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000)))
-
-# controlling for frequency of gaming
-character_m8 <- glmer(RT ~ 1 + manipulation + age + gender + 
-                      trials_character.thisN + freq_game + 
-                      (1 | id), 
-                      data = df_character, 
-                      subset = character_resp.corr == "1", 
-                      family = inverse.gaussian(link = "identity"),
-                      control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000)))
+character_m3 <- glmer(RT ~ 1 + manipulation + trials_character.thisN + (1 | id),
+            data = df_character,
+            subset = character_resp.corr == "1",
+            family = Gamma(link = "identity"),
+            start = list(fixef=coef(character_m3_fixef)),
+            control = glmerControl(optimizer = "bobyqa", nAGQ0initStep=FALSE, optCtrl = list(maxfun = 100000)),
+            verbose = 100)
 
 ```
 
@@ -720,14 +672,14 @@ tree_model_selection <- model_selection("tree_m", 9)
 token_model_selection <- model_selection("token_m", 8) 
 gaze_model_selection <- model_selection("gaze_m", 8) 
 icon_model_selection <- model_selection("icon_m", 2) 
-character_model_selection <- model_selection("character_m", 8) 
+character_model_selection <- model_selection("character_m", 3) 
 
 ```
 
 Clean up environment after deciding on which models to go with. For all models, this is assessed manually by looking at AIC and BIC values.
 
 
-     - chosen models: character_m3, character_accuracy_m2, gaze_m4, icon_m2, seed_m5, token_m3, tree_m3
+     - chosen models: character_m3, gaze_m4, icon_m2, seed_m5, token_m5, tree_m6
       
 ```{r}
 # variables to keep
