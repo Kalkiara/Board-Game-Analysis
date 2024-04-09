@@ -1,5 +1,5 @@
 ---
-title: "Untitled"
+title: "Modelling"
 author: "Maria"
 date: "3/19/2024"
 output: html_document
@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ```{r}
-pacman::p_load(tidyverse, patchwork, lmerTest)
+pacman::p_load(tidyverse, patchwork, lme4, lmerTest)
 ```
 
 Run the data cleaning .Rmd script
@@ -87,29 +87,6 @@ rm(modified_dfs_list,
 
 ```
 
-trying things
-
-```{r}
-# df_seed2 <- df_seed %>% 
-#   rename(tree_response.corr = seed_response.corr,
-#          correctTreenumber = correctSeednumber,
-#          trials_tree.thisN = trials_seeds.thisN) %>% 
-#   select(RT, correctTreenumber, trials_tree.thisN, tree_response.corr, id, manipulation, age, gender) %>% 
-#   mutate(task = "seed")
-# 
-# df_trees2 <- df_trees %>% 
-#   select(RT, correctTreenumber, trials_tree.thisN, tree_response.corr, id, manipulation, age, gender)%>% 
-#   mutate(task = "tree")
-# 
-# t <- rbind(df_trees2, df_seed2)
-# 
-# test1 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_tree.thisN + correctTreenumber + (1 | id), data = t, subset = tree_response.corr == "1")
-# test2 <- lmer(log(RT) ~ 1 + task + manipulation + age + gender + trials_tree.thisN + correctTreenumber + (1 | id), data = t, subset = tree_response.corr == "1")
-# 
-# # if some is within and some is between, can in be modelled in one go?
-```
-
-
 Plotting density distributions for response times
 
 ```{r}
@@ -145,12 +122,12 @@ icon_density <- ggplot(df_icon, aes(x = RT)) +
   theme_minimal()
 
 # plot using patchwork
-denity_response_times <- 
+density_response_times <- 
   (seed_density+tree_density)/
   (token_density+gaze_density)/
   (character_density+icon_density)
 
-denity_response_times
+density_response_times
 
 rm(seed_density,
    tree_density,
@@ -160,7 +137,7 @@ rm(seed_density,
    icon_density)
 ```
 
-Plotting density distributions for logged response times
+Log-transforming does not produce sufficient normality. Instead attempting generalized modelling approaches.
 
 ```{r}
 # density plots of the distributions of outcome variables -- logged response times
@@ -195,12 +172,12 @@ icon_density <- ggplot(df_icon, aes(x = log(RT))) +
   theme_minimal()
 
 # plot using patchwork
-denity_response_times <- 
+density_log_response_times <- 
   (seed_density+tree_density)/
   (token_density+gaze_density)/
   (character_density+icon_density)
 
-denity_response_times
+density_log_response_times
 
 rm(seed_density,
    tree_density,
@@ -208,6 +185,19 @@ rm(seed_density,
    gaze_density,
    character_density,
    icon_density)
+```
+
+Save density plot as png
+
+```{r}
+# specify dimensions of saved image
+width <- 1000  
+height <- 650 
+
+png(filename = "../out/RT_density.png", width = width, height = height)
+density_response_times
+
+dev.off()
 ```
 
 Modelling: Task with seed tokens
@@ -532,7 +522,7 @@ icon_m5 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials.thisN + freq_
 
 Two-part model specification starting with modelling the fixed effects, based on the following issue on gitHub: https://github.com/lme4/lme4/issues/573
 
-```{r}
+```{r, message=FALSE}
 # basic models
 icon_m1_fixef <- glm(RT ~ 1 + manipulation + age + gender, 
           data = df_icon,
@@ -689,42 +679,66 @@ variables_to_keep <- c("df_character", "df_gaze", "df_icon", "df_seed", "df_toke
                        "icon_model_selection", "seed_model_selection", 
                        "token_model_selection", "tree_model_selection",
                        
-                       "character_m3", "gaze_m4", "icon_m2", 
-                       "seed_m5", "token_m3", "tree_m3")
+                       "character_m3", "gaze_m4", "icon_m2",
+                       "seed_m5", "token_m5", "tree_m6",
+                       
+                       "character_m3_fixef", "icon_m2_fixef")
 
 # remove all variables except those in the list
 rm(list = setdiff(ls(), variables_to_keep))
 
 ```
 
-Checking assumptions - residual plotting
+Residual plotting
 
 ```{r}
 # list of selected models
 models <- list(
   
-  icon_m2 = glmer(RT ~ 1 + manipulation + trials.thisN + (1 | id),
-                 data = df_icon,
-                 subset = icon_resp.corr == "1",
-                 family = inverse.gaussian(link = "identity"),
-                 start = list(fixef=coef(icon_m2_fixef)),
-                 control = glmerControl(optimizer = "bobyqa", nAGQ0initStep=FALSE, optCtrl = list(maxfun = 100000)),
-                 verbose = 100),
-  seed_m5_glmer = glmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + correctSeednumber + (1 | id),
-                 data = df_seed,
-                 family = inverse.gaussian(link = "identity"),
-                 control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000))),
-  tree_m6_glmer = glmer(RT ~ 1 + manipulation + age + gender + color_trees_to_count + trials_tree.thisN + correctTreenumber + (1 | id), 
-                 data = df_trees, 
-                 subset = tree_response.corr == "1", 
-                 family = inverse.gaussian(link = "identity"),
-                 control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000))),
-  character_m3 = lmer(log(RT) ~ 1 + manipulation + age + gender + trials_character.thisN + (1 | id), data = df_character, subset = character_resp.corr == "1"),
-  gaze_m4 = lmer(log(RT) ~ 1 + manipulation + age + gender + stimulus_type + trials_gaze.thisN + (1 | id), data = df_gaze, subset = gaze_response.corr == "1"),
-  icon_m2 = lmer(log(RT) ~ 1 + manipulation + age + gender + trials.thisN + (1 | id), data = df_icon, subset = icon_resp.corr == "1"),
-  seed_m5 = lmer(log(RT) ~ 1 + manipulation + age + gender + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed, subset = seed_response.corr == "1"),
-  token_m3 = lmer(log(RT) ~ 1 + manipulation + age + gender + trials_tokens.thisN + (1 | id), data = df_tokens, subset = token_resp.corr == "1"),
-  tree_m3 = lmer(log(RT) ~ 1 + manipulation + age + gender + trials_tree.thisN + (1 | id), data = df_trees, subset = tree_response.corr == "1")
+  character = character_m3,
+  gaze = gaze_m4,
+  icon = icon_m2,
+  seed = seed_m5,
+  token = token_m5,
+  tree = tree_m6
+  # character = glmer(RT ~ 1 + manipulation + trials_character.thisN + (1 | id),
+  #                 data = df_character,
+  #                 subset = character_resp.corr == "1",
+  #                 family = Gamma(link = "identity"),
+  #                 start = list(fixef=coef(character_m3_fixef)),
+  #                 control = glmerControl(optimizer = "bobyqa", nAGQ0initStep=FALSE, optCtrl = list(maxfun = 100000)),
+  #                 verbose = 100),
+  # 
+  # gaze = glmer(RT ~ 1 + manipulation + age + gender + stimulus_type + trials_gaze.thisN + (1 | id), 
+  #                data = df_gaze, 
+  #                subset = gaze_response.corr == "1", 
+  #                family = inverse.gaussian(link = "identity"),
+  #                control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000))),
+  # 
+  # icon = glmer(RT ~ 1 + manipulation + trials.thisN + (1 | id),
+  #                data = df_icon,
+  #                subset = icon_resp.corr == "1",
+  #                family = inverse.gaussian(link = "identity"),
+  #                start = list(fixef=coef(icon_m2_fixef)),
+  #                control = glmerControl(optimizer = "bobyqa", nAGQ0initStep=FALSE, optCtrl = list(maxfun = 100000)),
+  #                verbose = 100),
+  # 
+  # seed = glmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + correctSeednumber + (1 | id),
+  #                data = df_seed,
+  #                family = inverse.gaussian(link = "identity"),
+  #                control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000))),
+  # 
+  # token = glmer(RT ~ 1 + manipulation + age + gender + trials_tokens.thisN + correct_token_options + (1 | id), 
+  #                 data = df_tokens, 
+  #                 subset = token_resp.corr == "1", 
+  #                 family = inverse.gaussian(link = "identity"),
+  #                 control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000))),
+  # 
+  # tree = glmer(RT ~ 1 + manipulation + age + gender + color_trees_to_count + trials_tree.thisN + correctTreenumber + (1 | id), 
+  #                data = df_trees, 
+  #                subset = tree_response.corr == "1", 
+  #                family = inverse.gaussian(link = "identity"),
+  #                control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000)))
 )
 
 
@@ -760,22 +774,19 @@ plots <- lapply(names(models), function(model_name) {
 # arrange plots in grid
 wrap_plots(plots)
 
+
 ```
 
-QQ-plot
+Save plot as png
 
 ```{r}
-# Q-Q plot of residuals
-qqnorm(residuals(tree_m5))
-qqline(residuals(tree_m5))
+# specify dimensions of saved image
+width <- 1500  
+height <- 960 
+
+png(filename = "../out/residuals.png", width = width, height = height)
+wrap_plots(plots)
+
+dev.off()
 ```
-```{r}
-# assess using qq plot
-ggplot(df_gaze, aes(sample = log(RT)))+ stat_qq()+
-stat_qq_line(colour = 'red')+
-ggtitle('Comparing to a normal distribution')+ labs(x = 'Expected values', y = 'Observed values')
-
-```
-
-
 
