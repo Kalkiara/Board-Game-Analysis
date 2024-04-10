@@ -16,6 +16,9 @@ The organization of the project is as follows:
 |            ├── dataset.csv       <- File in csv format containing survey data
 |            ├── labels.csv        <- File in csv format to translate analysis labels into meaningful levels
 |            └── variables.csv     <- File in csv format which lists the phrases used in the questionnaire
+├── out                            <- Folder containing plots and outputs from the analysis
+|   ├── RT_density.png             <- Density plots of response times
+|   └── residuals.png              <- Residual plots 
 └── src                            <- The main folder for scripts
     ├── Data cleaning.Rmd          <- R Markdown for cleaning and restructuring the raw data in preparation for modelling
     └── Modelling.Rmd              <- R Markdown for modelling and statistical analysis
