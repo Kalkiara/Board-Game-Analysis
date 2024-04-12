@@ -1,0 +1,249 @@
+Model 1 summary:
+Generalized linear mixed model fit by maximum likelihood (Laplace Approximation) ['glmerMod']
+ Family: Gamma  ( identity )
+Formula: RT ~ 1 + manipulation + trials_character.thisN + (1 | id)
+   Data: df_character
+Control: glmerControl(optimizer = "bobyqa", nAGQ0initStep = FALSE, optCtrl = list(maxfun = 1e+05))
+ Subset: character_resp.corr == "1"
+
+     AIC      BIC   logLik deviance df.resid 
+   364.4    376.7   -177.2    354.4       81 
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-1.2916 -0.6043 -0.2406  0.5318  3.6324 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ id       (Intercept) 0.8895   0.9431  
+ Residual             0.3416   0.5845  
+Number of obs: 86, groups:  id, 31
+
+Fixed effects:
+                       Estimate Std. Error t value Pr(>|z|)    
+(Intercept)              6.1070     0.5944  10.275  < 2e-16 ***
+manipulationedited      -0.7952     0.5591  -1.422    0.155    
+trials_character.thisN  -1.1443     0.1844  -6.204  5.5e-10 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+            (Intr) mnpltn
+manipltndtd -0.545       
+trls_chrc.N -0.755  0.136
+Model 2 summary:
+Generalized linear mixed model fit by maximum likelihood (Laplace Approximation) ['glmerMod']
+ Family: inverse.gaussian  ( identity )
+Formula: RT ~ 1 + manipulation + age + gender + stimulus_type + trials_gaze.thisN +      (1 | id)
+   Data: df_gaze
+Control: glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 1e+05))
+ Subset: gaze_response.corr == "1"
+
+     AIC      BIC   logLik deviance df.resid 
+   680.5    732.2   -327.2    654.5      382 
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-1.2518 -0.6334 -0.2558  0.3759  5.0514 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ id       (Intercept) 0.06997  0.2645  
+ Residual             0.16094  0.4012  
+Number of obs: 395, groups:  id, 32
+
+Fixed effects:
+                    Estimate Std. Error t value Pr(>|z|)    
+(Intercept)         0.687418   0.305333   2.251 0.024362 *  
+manipulationedited -0.090098   0.053441  -1.686 0.091808 .  
+age                 0.044269   0.011421   3.876 0.000106 ***
+genderMale         -0.079451   0.164845  -0.482 0.629824    
+stimulus_typegaze2  0.210155   0.103311   2.034 0.041931 *  
+stimulus_typegaze3  0.224050   0.104231   2.150 0.031591 *  
+stimulus_typegaze4  0.097708   0.090428   1.081 0.279918    
+stimulus_typegaze5  0.144766   0.092533   1.564 0.117704    
+stimulus_typegaze6 -0.130052   0.072031  -1.805 0.070997 .  
+stimulus_typegaze7  0.150713   0.102277   1.474 0.140597    
+trials_gaze.thisN  -0.048504   0.006634  -7.312 2.63e-13 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+            (Intr) mnpltn age    gndrMl stml_2 stml_3 stml_4 stml_5 stml_6 stml_7
+manipltndtd -0.129                                                               
+age         -0.904  0.006                                                        
+genderMale   0.000  0.044 -0.225                                                 
+stmls_typg2 -0.111  0.012  0.010  0.009                                          
+stmls_typg3 -0.040  0.023 -0.068  0.027  0.298                                   
+stmls_typg4 -0.093 -0.005 -0.022  0.012  0.404  0.346                            
+stmls_typg5 -0.092 -0.025 -0.031  0.009  0.346  0.325  0.375                     
+stmls_typg6 -0.131  0.022  0.020  0.013  0.436  0.420  0.507  0.471              
+stmls_typg7 -0.136  0.061  0.002  0.007  0.336  0.289  0.369  0.342  0.418       
+trls_gz.thN -0.165  0.091  0.008  0.029 -0.115 -0.053 -0.180  0.038 -0.215  0.098
+Model 3 summary:
+Generalized linear mixed model fit by maximum likelihood (Laplace Approximation) ['glmerMod']
+ Family: inverse.gaussian  ( identity )
+Formula: RT ~ 1 + manipulation + trials.thisN + (1 | id)
+   Data: df_icon
+Control: glmerControl(optimizer = "bobyqa", nAGQ0initStep = FALSE, optCtrl = list(maxfun = 1e+05))
+ Subset: icon_resp.corr == "1"
+
+     AIC      BIC   logLik deviance df.resid 
+   582.0    598.2   -286.0    572.0      183 
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-1.2612 -0.6455 -0.2443  0.4780  4.1595 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ id       (Intercept) 0.53973  0.7347  
+ Residual             0.06552  0.2560  
+Number of obs: 188, groups:  id, 32
+
+Fixed effects:
+                   Estimate Std. Error t value Pr(>|z|)    
+(Intercept)         4.27237    0.34501  12.383   <2e-16 ***
+manipulationedited -0.03687    0.43678  -0.084    0.933    
+trials.thisN       -0.34998    0.03655  -9.576   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+            (Intr) mnpltn
+manipltndtd -0.589       
+trials.thsN -0.320 -0.027
+Model 4 summary:
+Generalized linear mixed model fit by maximum likelihood (Laplace Approximation) ['glmerMod']
+ Family: inverse.gaussian  ( identity )
+Formula: RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN +      correctSeednumber + (1 | id)
+   Data: df_seed
+Control: glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 1e+05))
+
+     AIC      BIC   logLik deviance df.resid 
+  1228.8   1275.4   -603.4   1206.8      500 
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-1.3431 -0.6708 -0.2376  0.4604  5.2553 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ id       (Intercept) 0.07687  0.2773  
+ Residual             0.12542  0.3542  
+Number of obs: 511, groups:  id, 32
+
+Fixed effects:
+                    Estimate Std. Error t value Pr(>|z|)    
+(Intercept)         0.826687   0.385167   2.146  0.03185 *  
+manipulationedited -0.365521   0.064188  -5.695 1.24e-08 ***
+age                 0.074584   0.014974   4.981 6.33e-07 ***
+genderMale         -0.415305   0.187778  -2.212  0.02699 *  
+board_coloryellow   0.176592   0.062036   2.847  0.00442 ** 
+trials_seeds.thisN -0.077816   0.006411 -12.138  < 2e-16 ***
+correctSeednumber3 -0.006610   0.074494  -0.089  0.92930    
+correctSeednumber0  0.735619   0.115444   6.372 1.86e-10 ***
+correctSeednumber1 -0.011023   0.073260  -0.150  0.88040    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+            (Intr) mnpltn age    gndrMl brd_cl trl_.N crrcS3 crrcS0
+manipltndtd -0.159                                                 
+age         -0.925  0.044                                          
+genderMale   0.109  0.003 -0.296                                   
+brd_clryllw -0.031 -0.112 -0.008 -0.032                            
+trls_sds.tN -0.216  0.141  0.043  0.002 -0.071                     
+crrctSdnmb3 -0.066 -0.005 -0.026  0.003 -0.056 -0.019              
+crrctSdnmb0 -0.046  0.049 -0.054  0.032  0.016  0.035  0.311       
+crrctSdnmb1 -0.088 -0.090 -0.008  0.013  0.071 -0.029  0.515  0.335
+Model 5 summary:
+Generalized linear mixed model fit by maximum likelihood (Laplace Approximation) ['glmerMod']
+ Family: inverse.gaussian  ( identity )
+Formula: RT ~ 1 + manipulation + age + gender + trials_tokens.thisN +      correct_token_options + (1 | id)
+   Data: df_tokens
+Control: glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 1e+05))
+ Subset: token_resp.corr == "1"
+
+     AIC      BIC   logLik deviance df.resid 
+   847.4    907.3   -407.7    815.4      296 
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-1.7129 -0.6834 -0.1346  0.4604  5.0045 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ id       (Intercept) 0.18793  0.4335  
+ Residual             0.02723  0.1650  
+Number of obs: 312, groups:  id, 32
+
+Fixed effects:
+                       Estimate Std. Error t value Pr(>|z|)    
+(Intercept)             2.13574    0.57182   3.735 0.000188 ***
+manipulationedited     -0.65705    0.30012  -2.189 0.028576 *  
+age                     0.08840    0.01980   4.465 8.01e-06 ***
+genderMale             -0.36681    0.31128  -1.178 0.238647    
+trials_tokens.thisN    -0.06309    0.01510  -4.179 2.93e-05 ***
+correct_token_optionsm -0.13101    0.22583  -0.580 0.561808    
+correct_token_optionsa -0.63958    0.20042  -3.191 0.001417 ** 
+correct_token_optionso  0.13280    0.23902   0.556 0.578476    
+correct_token_optionsn -0.32583    0.21421  -1.521 0.128248    
+correct_token_optionsb  0.09035    0.24099   0.375 0.707736    
+correct_token_optionsg -0.64046    0.20042  -3.196 0.001396 ** 
+correct_token_optionsd -0.42561    0.21372  -1.991 0.046437 *  
+correct_token_optionsh -0.41339    0.22137  -1.867 0.061843 .  
+correct_token_optionsk -0.21356    0.21844  -0.978 0.328242    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Model 6 summary:
+Generalized linear mixed model fit by maximum likelihood (Laplace Approximation) ['glmerMod']
+ Family: inverse.gaussian  ( identity )
+Formula: RT ~ 1 + manipulation + age + gender + color_trees_to_count +      trials_tree.thisN + correctTreenumber + (1 | id)
+   Data: df_trees
+Control: glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 1e+05))
+ Subset: tree_response.corr == "1"
+
+     AIC      BIC   logLik deviance df.resid 
+  1149.5   1206.7   -560.8   1121.5      423 
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-2.6449 -0.5838 -0.1678  0.4276  4.5598 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ id       (Intercept) 0.20718  0.4552  
+ Residual             0.02919  0.1709  
+Number of obs: 437, groups:  id, 32
+
+Fixed effects:
+                            Estimate Std. Error t value Pr(>|z|)    
+(Intercept)                 2.049393   0.534761   3.832 0.000127 ***
+manipulationedited         -0.155170   0.087062  -1.782 0.074702 .  
+age                         0.074544   0.018973   3.929 8.53e-05 ***
+genderMale                 -0.805190   0.390346  -2.063 0.039135 *  
+color_trees_to_countgreen   0.252677   0.105355   2.398 0.016469 *  
+color_trees_to_countorange -0.106256   0.167045  -0.636 0.524714    
+color_trees_to_countpink   -0.023672   0.136028  -0.174 0.861845    
+color_trees_to_countyellow  0.039885   0.151946   0.262 0.792942    
+trials_tree.thisN          -0.063589   0.007526  -8.449  < 2e-16 ***
+correctTreenumber3          0.368542   0.121248   3.040 0.002369 ** 
+correctTreenumber4          0.318011   0.109742   2.898 0.003758 ** 
+correctTreenumber1         -0.056845   0.211299  -0.269 0.787910    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+               (Intr) mnpltn age    gndrMl clr_trs_t_cntg clr_trs_t_cntr clr_trs_t_cntp clr_trs_t_cnty trl_.N crrcT3 crrcT4
+manipltndtd    -0.069                                                                                                      
+age            -0.885  0.002                                                                                               
+genderMale      0.009 -0.008 -0.280                                                                                        
+clr_trs_t_cntg -0.078 -0.052  0.003  0.011                                                                                 
+clr_trs_t_cntr -0.056 -0.092  0.015  0.014  0.454                                                                          
+clr_trs_t_cntp -0.024 -0.281  0.011  0.000  0.366          0.453                                                           
+clr_trs_t_cnty -0.062  0.304  0.006  0.006  0.270          0.325          0.302                                            
+trls_tr.thN    -0.127 -0.018  0.013 -0.015  0.023          0.079          0.100          0.065                             
+crrctTrnmb3    -0.029 -0.030 -0.005 -0.007 -0.298         -0.604         -0.459         -0.381         -0.030              
+crrctTrnmb4    -0.063 -0.073  0.000 -0.001  0.125         -0.116         -0.336         -0.368         -0.085  0.484       
+crrctTrnmb1    -0.042  0.265  0.003 -0.008 -0.190         -0.725         -0.350         -0.140         -0.005  0.578  0.264

@@ -1,5 +1,5 @@
 ---
-title: "Modelling"
+title: "Modeling"
 author: "Maria"
 date: "3/19/2024"
 output: html_document
@@ -24,7 +24,7 @@ rmarkdown::render(file_name, quiet = TRUE)
 rm(file_name)
 ```
 
-Handle outliers before modelling
+Handle outliers before modeling
 
 ```{r}
 # function for finding cutoff for outliers
@@ -137,57 +137,8 @@ rm(seed_density,
    icon_density)
 ```
 
-Log-transforming does not produce sufficient normality. Instead attempting generalized modelling approaches.
-
-```{r}
-# density plots of the distributions of outcome variables -- logged response times
-seed_density <- ggplot(df_seed, aes(x = log(RT))) +
-  geom_density(fill = "skyblue", color = "blue", alpha = 0.7) +
-  labs(title = "Seed - Response Time: Density Plot", x = "RT", y = "Density") +
-  theme_minimal()
-
-tree_density <- ggplot(df_trees, aes(x = log(RT))) +
-  geom_density(fill = "palegreen2", color = "palegreen4", alpha = 0.7) +
-  labs(title = "Trees - Response Time: Density Plot", x = "RT", y = "Density") +
-  theme_minimal()
-
-token_density <- ggplot(df_tokens, aes(x = log(RT))) +
-  geom_density(fill = "darkgoldenrod1", color = "darkgoldenrod", alpha = 0.7) +
-  labs(title = "Token - Response Time: Density Plot", x = "RT", y = "Density") +
-  theme_minimal()
-
-gaze_density <- ggplot(df_gaze, aes(x = log(RT))) +
-  geom_density(fill = "lightpink", color = "lightpink4", alpha = 0.7) +
-  labs(title = "Gaze - Response Time: Density Plot", x = "RT", y = "Density") +
-  theme_minimal()
-
-character_density <- ggplot(df_character, aes(x = log(RT))) +
-  geom_density(fill = "aquamarine", color = "aquamarine4", alpha = 0.7) +
-  labs(title = "Character - Response Time: Density Plot", x = "RT", y = "Density") +
-  theme_minimal()
-
-icon_density <- ggplot(df_icon, aes(x = log(RT))) +
-  geom_density(fill = "plum", color = "plum4", alpha = 0.7) +
-  labs(title = "Icon - Response Time: Density Plot", x = "RT", y = "Density") +
-  theme_minimal()
-
-# plot using patchwork
-density_log_response_times <- 
-  (seed_density+tree_density)/
-  (token_density+gaze_density)/
-  (character_density+icon_density)
-
-density_log_response_times
-
-rm(seed_density,
-   tree_density,
-   token_density,
-   gaze_density,
-   character_density,
-   icon_density)
-```
-
-Save density plot as png
+Log-transforming does not produce sufficient normality. Instead attempting generalized modeling approaches.
+Save density plot as png:
 
 ```{r}
 # specify dimensions of saved image
@@ -200,30 +151,7 @@ density_response_times
 dev.off()
 ```
 
-Modelling: Task with seed tokens
-
-```{r}
-# basic models
-seed_m1 <- lmer(log(RT) ~ 1 + manipulation + age + gender + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-seed_m2 <- lmer(log(RT) ~ 1 + manipulation + age + gender + board_color + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-
-# controlling for stimulus order and which key was pressed
-seed_m3 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_seeds.thisN + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-seed_m4 <- lmer(log(RT) ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-seed_m5 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-seed_m6 <- lmer(log(RT) ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + correctSeednumber + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-
-# controlling for having played the game
-seed_m7 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_seeds.thisN + played_photo + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-seed_m8 <- lmer(log(RT) ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + played_photo + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-
-# controlling for frequency of gaming
-seed_m9 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_seeds.thisN + freq_game + (1 |id), data = df_seed, subset = seed_response.corr == "1")
-
-
-```
-
-Using generalized modelling
+Modeling: Task with seed tokens
 
 ```{r}
 
@@ -272,29 +200,7 @@ seed_m7 <- glmer(RT ~ 1 + manipulation + age + gender + trials_seeds.thisN + fre
 
 ```
 
-Modelling: Task with tree colors
-
-```{r}
-# basic models
-tree_m1 <- lmer(log(RT) ~ 1 + manipulation + age + gender + (1 | id), data = df_trees, subset = tree_response.corr == "1")
-tree_m2 <- lmer(log(RT) ~ 1 + manipulation + age + gender + color_trees_to_count + (1 | id), data = df_trees, subset = tree_response.corr == "1")
-
-# controlling for stimulus order and which key was pressed
-tree_m3 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_tree.thisN + (1 | id), data = df_trees, subset = tree_response.corr == "1")
-tree_m4 <- lmer(log(RT) ~ 1 + manipulation + age + gender + color_trees_to_count + trials_tree.thisN + (1 | id), data = df_trees, subset = tree_response.corr == "1")
-tree_m5 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_tree.thisN + correctTreenumber + (1 | id), data = df_trees, subset = tree_response.corr == "1")
-tree_m6 <- lmer(log(RT) ~ 1 + manipulation + age + gender + color_trees_to_count + trials_tree.thisN + correctTreenumber + (1 | id), data = df_trees, subset = tree_response.corr == "1")
-
-# controlling for having played the game
-tree_m7 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_tree.thisN + played_photo + (1 | id), data = df_trees, subset = tree_response.corr == "1")
-tree_m8 <- lmer(log(RT) ~ 1 + manipulation + age + gender + color_trees_to_count + trials_tree.thisN + played_photo + (1 | id), data = df_trees, subset = tree_response.corr == "1")
-
-# controlling for frequency of gaming
-tree_m9 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_tree.thisN + freq_game + (1 | id), data = df_trees, subset = tree_response.corr == "1")
-
-
-```
-
+modeling: Task with tree colors
 
 ```{r}
 
@@ -355,29 +261,7 @@ tree_m9 <- glmer(RT ~ 1 + manipulation + age + gender + trials_tree.thisN + freq
 
 ```
 
-Modelling: Task with token symbols
-
-```{r}
-# basic models
-token_m1 <- lmer(log(RT) ~ 1 + manipulation + age + gender + (1 | id), data = df_tokens, subset = token_resp.corr == "1")
-token_m2 <- lmer(log(RT) ~ 1 + manipulation + age + gender + token_color + (1 | id), data = df_tokens, subset = token_resp.corr == "1")
-
-# controlling for stimulus order and which key was pressed
-token_m3 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_tokens.thisN + (1 | id), data = df_tokens, subset = token_resp.corr == "1")
-token_m4 <- lmer(log(RT) ~ 1 + manipulation + age + gender + token_color + trials_tokens.thisN + (1 | id), data = df_tokens, subset = token_resp.corr == "1")
-token_m5 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_tokens.thisN + correct_token_options + (1 | id), data = df_tokens, subset = token_resp.corr == "1")
-
-# rank deficincy when including both key-press and token color in the same model -- skipping this one
-
-# controlling for having played the game
-token_m6 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_tokens.thisN + played_haven + (1 | id), data = df_tokens, subset = token_resp.corr == "1")
-token_m7 <- lmer(log(RT) ~ 1 + manipulation + age + gender + token_color + trials_tokens.thisN + played_haven + (1 | id), data = df_tokens, subset = token_resp.corr == "1")
-
-# controlling for frequency of gaming
-token_m8 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_tokens.thisN + freq_game + (1 | id), data = df_tokens, subset = token_resp.corr == "1")
-
-```
-
+modeling: Task with token symbols
 
 ```{r}
 # basic models
@@ -428,27 +312,7 @@ token_m8 <- glmer(RT ~ 1 + manipulation + age + gender + trials_tokens.thisN + f
 
 ```
 
-Modelling: Task with gaze direction
-
-```{r}
-# basic models
-gaze_m1 <- lmer(log(RT) ~ 1 + manipulation + age + gender + (1 | id), data = df_gaze, subset = gaze_response.corr == "1")
-gaze_m2 <- lmer(log(RT) ~ 1 + manipulation + age + gender + stimulus_type + (1 | id), data = df_gaze, subset = gaze_response.corr == "1")
-
-# controlling for stimulus order, stimulus type and/or which key was pressed
-gaze_m3 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_gaze.thisN + (1 | id), data = df_gaze, subset = gaze_response.corr == "1")
-gaze_m4 <- lmer(log(RT) ~ 1 + manipulation + age + gender + stimulus_type + trials_gaze.thisN + (1 | id), data = df_gaze, subset = gaze_response.corr == "1")
-gaze_m5 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_gaze.thisN + correctGazeanswer + (1 | id), data = df_gaze, subset = gaze_response.corr == "1")
-
-
-# controlling for having played the game
-gaze_m6 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_gaze.thisN + played_tang + (1 | id), data = df_gaze, subset = gaze_response.corr == "1")
-gaze_m7 <- lmer(log(RT) ~ 1 + manipulation + age + gender + stimulus_type + trials_gaze.thisN + played_tang + (1 | id), data = df_gaze, subset = gaze_response.corr == "1")
-
-# controlling for frequency of gaming
-gaze_m8 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_gaze.thisN + freq_game + (1 | id), data = df_gaze, subset = gaze_response.corr == "1")
-
-```
+modeling: Task with gaze direction
 
 ```{r}
 # basic models
@@ -502,25 +366,10 @@ gaze_m8 <- glmer(RT ~ 1 + manipulation + age + gender + trials_gaze.thisN + freq
 
 ```
 
-Modelling: Task with icon matching 
+modeling: Task with icon matching 
 
-```{r}
-# basic models
-icon_m1 <- lmer(log(RT) ~ 1 + manipulation + age + gender + (1 | id), data = df_icon, subset = icon_resp.corr == "1")
 
-# controlling for stimulus order and which key was pressed
-icon_m2 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials.thisN + (1 | id), data = df_icon, subset = icon_resp.corr == "1")
-icon_m3 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials.thisN + correct_landscape_options + (1 | id), data = df_icon, subset = icon_resp.corr == "1")
-
-# controlling for having played the game
-icon_m4 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials.thisN + played_tang + (1 | id), data = df_icon, subset = icon_resp.corr == "1")
-
-# controlling for frequency of gaming
-icon_m5 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials.thisN + freq_game + (1 | id), data = df_icon, subset = icon_resp.corr == "1")
-
-```
-
-Two-part model specification starting with modelling the fixed effects, based on the following issue on gitHub: https://github.com/lme4/lme4/issues/573
+Two-part model specification starting with modeling the fixed effects, based on the following issue on gitHub: https://github.com/lme4/lme4/issues/573
 
 ```{r, message=FALSE}
 # basic models
@@ -566,28 +415,7 @@ icon_m2 <- glmer(RT ~ 1 + manipulation + trials.thisN + (1 | id),
 
 ```
 
-
-Modelling: Task with character matching
-
-```{r}
-# basic models
-character_m1 <- lmer(log(RT) ~ 1 + manipulation + age + gender + (1 | id), data = df_character, subset = character_resp.corr == "1")
-character_m2 <- lmer(log(RT) ~ 1 + manipulation + age + gender + character_type + (1 | id), data = df_character, subset = character_resp.corr == "1")
-
-# controlling for stimulus order and which key was pressed
-character_m3 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_character.thisN + (1 | id), data = df_character, subset = character_resp.corr == "1")
-character_m4 <- lmer(log(RT) ~ 1 + manipulation + age + gender + character_type + trials_character.thisN + (1 | id), data = df_character, subset = character_resp.corr == "1")
-character_m5 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_character.thisN + correct_character_options + (1 | id), data = df_character, subset = character_resp.corr == "1")
-
-
-# controlling for having played the game
-character_m6 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_character.thisN + played_tang + (1 | id), data = df_character, subset = character_resp.corr == "1")
-character_m7 <- lmer(log(RT) ~ 1 + manipulation + age + gender + character_type + trials_character.thisN + played_tang + (1 | id), data = df_character, subset = character_resp.corr == "1")
-
-# controlling for frequency of gaming
-character_m8 <- lmer(log(RT) ~ 1 + manipulation + age + gender + trials_character.thisN + freq_game + (1 | id), data = df_character, subset = character_resp.corr == "1")
-
-```
+modeling: Task with character matching
 
 ```{r}
 # basic models
@@ -701,44 +529,6 @@ models <- list(
   seed = seed_m5,
   token = token_m5,
   tree = tree_m6
-  # character = glmer(RT ~ 1 + manipulation + trials_character.thisN + (1 | id),
-  #                 data = df_character,
-  #                 subset = character_resp.corr == "1",
-  #                 family = Gamma(link = "identity"),
-  #                 start = list(fixef=coef(character_m3_fixef)),
-  #                 control = glmerControl(optimizer = "bobyqa", nAGQ0initStep=FALSE, optCtrl = list(maxfun = 100000)),
-  #                 verbose = 100),
-  # 
-  # gaze = glmer(RT ~ 1 + manipulation + age + gender + stimulus_type + trials_gaze.thisN + (1 | id), 
-  #                data = df_gaze, 
-  #                subset = gaze_response.corr == "1", 
-  #                family = inverse.gaussian(link = "identity"),
-  #                control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000))),
-  # 
-  # icon = glmer(RT ~ 1 + manipulation + trials.thisN + (1 | id),
-  #                data = df_icon,
-  #                subset = icon_resp.corr == "1",
-  #                family = inverse.gaussian(link = "identity"),
-  #                start = list(fixef=coef(icon_m2_fixef)),
-  #                control = glmerControl(optimizer = "bobyqa", nAGQ0initStep=FALSE, optCtrl = list(maxfun = 100000)),
-  #                verbose = 100),
-  # 
-  # seed = glmer(RT ~ 1 + manipulation + age + gender + board_color + trials_seeds.thisN + correctSeednumber + (1 | id),
-  #                data = df_seed,
-  #                family = inverse.gaussian(link = "identity"),
-  #                control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000))),
-  # 
-  # token = glmer(RT ~ 1 + manipulation + age + gender + trials_tokens.thisN + correct_token_options + (1 | id), 
-  #                 data = df_tokens, 
-  #                 subset = token_resp.corr == "1", 
-  #                 family = inverse.gaussian(link = "identity"),
-  #                 control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000))),
-  # 
-  # tree = glmer(RT ~ 1 + manipulation + age + gender + color_trees_to_count + trials_tree.thisN + correctTreenumber + (1 | id), 
-  #                data = df_trees, 
-  #                subset = tree_response.corr == "1", 
-  #                family = inverse.gaussian(link = "identity"),
-  #                control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000)))
 )
 
 
@@ -788,5 +578,31 @@ png(filename = "../out/residuals.png", width = width, height = height)
 wrap_plots(plots)
 
 dev.off()
+```
+
+View summaries
+
+```{r}
+# view summaries of all models
+for (i in seq_along(models)) {
+  cat("Model", i, "summary:\n")
+  print(summary(models[[i]]))
+}
+
+```
+Save output
+
+```{r}
+# open connection to save output as text file
+sink("../out/model_summaries.txt")
+
+# run same code as in above chunk
+for (i in seq_along(models)) {
+  cat("Model", i, "summary:\n")
+  print(summary(models[[i]]))
+}
+
+# close the connection
+sink()
 ```
 
