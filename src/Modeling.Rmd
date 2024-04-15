@@ -510,7 +510,9 @@ variables_to_keep <- c("df_character", "df_gaze", "df_icon", "df_seed", "df_toke
                        "character_m3", "gaze_m4", "icon_m2",
                        "seed_m5", "token_m5", "tree_m6",
                        
-                       "character_m3_fixef", "icon_m2_fixef")
+                       "character_m3_fixef", "icon_m2_fixef",
+                       
+                       "df_list")
 
 # remove all variables except those in the list
 rm(list = setdiff(ls(), variables_to_keep))
@@ -590,7 +592,8 @@ for (i in seq_along(models)) {
 }
 
 ```
-Save output
+
+Save summary output
 
 ```{r}
 # open connection to save output as text file
@@ -605,4 +608,75 @@ for (i in seq_along(models)) {
 # close the connection
 sink()
 ```
+
+Plot differences
+
+
+```{r}
+# select specific columns from each dataframe
+df_seed_subset <- df_seed[, c("RT", "manipulation")] %>%
+  mutate(task = "Investigation 2")
+df_tokens_subset <- df_tokens[, c("RT", "manipulation")] %>%
+  mutate(task = "Investigation 4")
+df_character_subset <- df_character[, c("RT", "manipulation")] %>%
+  mutate(task = "Investigation 1")
+df_gaze_subset <- df_gaze[, c("RT", "manipulation")] %>%
+  mutate(task = "Investigation 5")
+df_icon_subset <- df_icon[, c("RT", "manipulation")] %>%
+  mutate(task = "Investigation 6")
+df_trees_subset <- df_trees[, c("RT", "manipulation")] %>%
+  mutate(task = "Investigation 3")
+
+# combine the selected columns
+plotting_df <-
+  rbind(
+    df_seed_subset,
+    df_tokens_subset,
+    df_character_subset,
+    df_gaze_subset,
+    df_icon_subset,
+    df_trees_subset
+  ) 
+
+
+# define custom color palette for task and manipulation levels
+palette <- brewer.pal(n = 12, 
+                      name = "Paired")
+
+custom_labels <- c("seed matching", "","tokens matching", "character matching", "gaze matching", "icon matching", "trees matching")
+
+# violin plot 
+violins <- ggplot(plotting_df, 
+                  aes(x = manipulation, y = RT, fill = interaction(manipulation, task))) +
+                  geom_violin(color = "black", size = 0.5, width = 0.7) +  
+                  geom_boxplot(width = 0.1, fill = "white", color = "black", alpha = 0.5, outlier.shape = NA) + 
+                  labs(x = "Manipulation", y = "Response Time", color = "My Custom Legend Title") +  
+                  facet_wrap(~ task, scales = "free") +  
+                  scale_fill_manual(values = c(palette[1], palette[2], 
+                                               palette[3], palette[4], 
+                                               palette[5], palette[6], 
+                                               palette[7], palette[8], 
+                                               palette[9], palette[10], 
+                                               "peru", palette[12]),
+                                     name = "Investigation") +  
+                  theme_minimal() 
+                  
+violins    
+
+```
+
+Save violin plot
+
+```{r}
+# specify dimensions of saved image
+width <- 1000  
+height <- 800 
+
+png(filename = "../out/violin_plot.png", width = width, height = height)
+violins
+
+dev.off()
+```
+
+
 
