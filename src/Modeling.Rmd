@@ -674,13 +674,14 @@ Save violin plot
 width <- 3000
 height <- 2400
 
-png(filename = "../out/violin_plot.png", width = width, height = height)
+png(filename = "../out/violin_plot_d.png", width = width, height = height)
 violins +
   theme(strip.text = element_text(size = 45),  # facet labels
         axis.text.x = element_text(size = 40), # axis text
+        axis.text.y = element_text(size = 40),
         axis.title.x = element_text(size = 45), # axis labels
-        axis.title.y = element_text(size = 45),
-        legend.position = "none") # 
+        axis.title.y = element_text(size = 45))#,
+        # legend.position = "none") # 
 
 dev.off()
 ```
