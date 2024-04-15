@@ -650,8 +650,8 @@ violins <- ggplot(plotting_df,
                   aes(x = manipulation, y = RT, fill = interaction(manipulation, task))) +
                   geom_violin(color = "black", size = 0.5, width = 0.7) +  
                   geom_boxplot(width = 0.1, fill = "white", color = "black", alpha = 0.5, outlier.shape = NA) + 
-                  labs(x = "Manipulation", y = "Response Time", color = "My Custom Legend Title") +  
-                  facet_wrap(~ task, scales = "free") +  
+                  labs(x = "Manipulation", y = "Response Time") +  
+                  facet_wrap(~ task, scales = "free") + 
                   scale_fill_manual(values = c(palette[1], palette[2], 
                                                palette[3], palette[4], 
                                                palette[5], palette[6], 
@@ -669,11 +669,18 @@ Save violin plot
 
 ```{r}
 # specify dimensions of saved image
-width <- 1000  
-height <- 800 
+# width <- 1000  
+# height <- 800 
+width <- 3000
+height <- 2400
 
 png(filename = "../out/violin_plot.png", width = width, height = height)
-violins
+violins +
+  theme(strip.text = element_text(size = 45),  # facet labels
+        axis.text.x = element_text(size = 40), # axis text
+        axis.title.x = element_text(size = 45), # axis labels
+        axis.title.y = element_text(size = 45),
+        legend.position = "none") # 
 
 dev.off()
 ```
