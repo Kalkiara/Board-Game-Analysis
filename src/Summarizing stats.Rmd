@@ -1,0 +1,48 @@
+---
+title: "Summarizing stats"
+author: "Maria"
+date: "4/16/2024"
+output: html_document
+---
+
+```{r, warning = FALSE}
+
+file_name <- "Data cleaning.Rmd"
+rmarkdown::render(file_name, quiet = TRUE)
+
+rm(file_name)
+```
+
+Number and age of participants
+
+```{r}
+df %>% summarise(
+  n_participants = length(unique(id)),
+  mean_age = mean(age),
+  sd_age = sd(age)
+  )
+
+```
+
+Board game familiarity
+
+```{r}
+# board gaming frequency
+df %>%
+  group_by(freq_game) %>% 
+  summarise(unique(id)) %>% 
+  count()
+
+# difficulties 
+df %>%
+  group_by(diff_remember) %>% 
+  summarise(unique(id)) %>% 
+  count()
+
+df %>%
+  group_by(diff_understand) %>% 
+  summarise(unique(id)) %>% 
+  count()
+
+```
+
