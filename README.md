@@ -7,22 +7,26 @@ The organization of the project is as follows:
 
 
 ```
-├── README.md                      <- The top-level README for this project
-├── data                           <- The main folder for data
-|   ├── cleaned data               <- Folder containing cleaned csv files for each task
-|   └── raw data                   <- Folder containing raw data 
-|        ├── experimental data     <- Folder containing a csv file and compressed zip per participant with data from Pavlovia 
-|        └── survey data           <- Folder containing survey data 
-|            ├── dataset.csv       <- File in csv format containing survey data
-|            ├── labels.csv        <- File in csv format to translate analysis labels into meaningful levels
-|            └── variables.csv     <- File in csv format which lists the phrases used in the questionnaire
-├── out                            <- Folder containing plots and outputs from the analysis
-|   ├── RT_density.png             <- Density plots of response times
-|   ├── model_summaries.txt        <- File in txt format containing summaries for all models
-|   └── residuals.png              <- Residual plots 
-└── src                            <- The main folder for scripts
-    ├── Data cleaning.Rmd          <- R Markdown for cleaning and restructuring the raw data in preparation for modelling
-    └── Modeling.Rmd              <- R Markdown for modelling and statistical analysis
+├── README.md                                                  <- The top-level README for this project
+├── data                                                       <- The main folder for data
+|   ├── cleaned data                                           <- Folder containing cleaned csv files for each task
+|   └── raw data                                               <- Folder containing raw data 
+|        ├── experimental data                                 <- Folder containing a csv file and compressed zip per participant with data from Pavlovia
+|        |   └── PARTICIPANT_board_game_yyyy-mm-dd.csv         <- File in csv format containing data on a single participant 
+|        |       [...]                                         <- ... continued
+|        └── survey data                                       <- Folder containing survey data 
+|            ├── dataset.csv                                   <- File in csv format containing survey data
+|            ├── labels.csv                                    <- File in csv format to translate analysis labels into meaningful levels
+|            └── variables.csv                                 <- File in csv format which lists the phrases used in the questionnaire
+├── out                                                        <- Folder containing plots and outputs from the analysis
+|   ├── RT_density.png                                         <- Density plots of response times
+|   ├── model_summaries.txt                                    <- File in txt format containing summaries for all models
+|   └── residuals.png                                          <- Residual plots
+|   └── violin_plot.png                                        <- Violin plots 
+└── src                                                        <- The main folder for scripts
+    ├── Data cleaning.Rmd                                      <- R Markdown for cleaning and restructuring the raw data in preparation for modelling
+    ├── Modeling.Rmd                                           <- R Markdown for modelling and statistical analysis
+    └── Summarizing stats.Rmd                                  <- R Markdown for summarizing statistics
 
 ```
 
