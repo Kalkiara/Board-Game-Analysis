@@ -46,3 +46,77 @@ df %>%
 
 ```
 
+Accuracy statistics (post hoc)
+
+```{r}
+# see accuracy for each condition
+df_character %>%
+  group_by(manipulation, character_resp.corr) %>% 
+  summarise(count = n()) %>%
+  arrange(manipulation, character_resp.corr)
+
+# ratios
+# original: 43/(29+43) = 60 percent answered correctly
+# edited: 43/(13+43) = 77 percent answered correctly
+
+```
+
+```{r}
+# see accuracy for each condition
+df_seed %>%
+  group_by(manipulation, seed_response.corr) %>% 
+  summarise(count = n()) %>%
+  arrange(manipulation, seed_response.corr)
+
+# ratios
+# original: 218/(218+38) = 85 percent answered correctly
+# edited: 238/(238+18) = 93 percent answered correctly
+```
+```{r}
+# see accuracy for each condition
+df_gaze %>%
+  group_by(manipulation, gaze_response.corr) %>% 
+  summarise(count = n()) %>%
+  arrange(manipulation, gaze_response.corr)
+
+# ratios
+# original: 194/(194+30) = 87 percent answered correctly
+# edited: 201/(201+23) = 90 percent answered correctly
+```
+
+```{r}
+# see accuracy for each condition
+df_icon %>%
+  group_by(manipulation, icon_resp.corr) %>% 
+  summarise(count = n()) %>%
+  arrange(manipulation, icon_resp.corr)
+
+# ratios
+# original: 81/(81+3) = 96 percent answered correctly
+# edited: 107/(107+1) = 99 percent answered correctly
+```
+
+```{r}
+# see accuracy for each condition
+df_tokens %>%
+  group_by(manipulation, token_resp.corr) %>% 
+  summarise(count = n()) %>%
+  arrange(manipulation, token_resp.corr)
+
+# ratios
+# original: 176/(176+4) = 98 percent answered correctly
+# edited: 136/(136+4) = 97 percent answered correctly
+```
+
+```{r}
+# see accuracy for each condition
+df_trees %>%
+  group_by(manipulation, tree_response.corr) %>% 
+  summarise(count = n()) %>%
+  arrange(manipulation, tree_response.corr)
+
+# ratios
+# original: 232/(232+24) = 91 percent answered correctly
+# edited: 205/(205+51) = 80 percent answered correctly
+```
+
