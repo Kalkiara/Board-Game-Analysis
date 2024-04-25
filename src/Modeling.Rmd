@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ```{r}
-pacman::p_load(tidyverse, patchwork, lme4, lmerTest)
+pacman::p_load(tidyverse, patchwork, RColorBrewer, lme4, lmerTest)
 ```
 
 Run the data cleaning .Rmd script
@@ -88,6 +88,20 @@ rm(modified_dfs_list,
 ```
 
 Plotting density distributions for response times
+```{r}
+# define custom color palette for task and manipulation levels
+palette <- brewer.pal(n = 12, 
+                      name = "Paired")
+
+
+                  scale_fill_manual(values = c(palette[1], palette[2], 
+                                               palette[3], palette[4], 
+                                               palette[5], palette[6], 
+                                               palette[7], palette[8], 
+                                               palette[9], palette[10], 
+                                               "peru", palette[12])
+
+```
 
 ```{r}
 # density plots of the distributions of outcome variables
@@ -643,7 +657,7 @@ plotting_df <-
 palette <- brewer.pal(n = 12, 
                       name = "Paired")
 
-custom_labels <- c("seed matching", "","tokens matching", "character matching", "gaze matching", "icon matching", "trees matching")
+custom_labels <- c("seed matching","tokens matching", "character matching", "gaze matching", "icon matching", "trees matching")
 
 # violin plot 
 violins <- ggplot(plotting_df, 

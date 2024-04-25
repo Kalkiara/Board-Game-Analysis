@@ -573,8 +573,7 @@ Clean environment
 
 ```{r}
 # remove
-rm(df,
-   df_list,
+rm(df_list,
    file_names,
    folder_path,
    i,

@@ -119,4 +119,12 @@ df_trees %>%
 # original: 232/(232+24) = 91 percent answered correctly
 # edited: 205/(205+51) = 80 percent answered correctly
 ```
+```{r}
+# which color is most error prone?
+df_trees %>%
+  filter(tree_response.corr == 0) %>% 
+  group_by(manipulation, color_trees_to_count) %>% 
+  summarise(count = n()) %>%
+  arrange(manipulation, color_trees_to_count)
+```
 
