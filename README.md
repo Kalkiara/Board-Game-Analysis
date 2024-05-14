@@ -24,9 +24,10 @@ The organization of the project is as follows:
 |   └── residuals.png                                          <- Residual plots
 |   └── violin_plot.png                                        <- Violin plots 
 └── src                                                        <- The main folder for scripts
-    ├── Data cleaning.Rmd                                      <- R Markdown for cleaning and restructuring the raw data in preparation for modelling
-    ├── Modeling.Rmd                                           <- R Markdown for modelling and statistical analysis
-    └── Summarizing stats.Rmd                                  <- R Markdown for summarizing statistics
+|   ├── Data cleaning.Rmd                                      <- R Markdown for cleaning and restructuring the raw data in preparation for modelling
+|   ├── Modeling.Rmd                                           <- R Markdown for modelling and statistical analysis
+|   └── Summarizing stats.Rmd                                  <- R Markdown for summarizing statistics
+└── Board Game Expert Reviews.pdf                              <- File in pdf format containing the associated report on design recommendations
 
 ```
 
